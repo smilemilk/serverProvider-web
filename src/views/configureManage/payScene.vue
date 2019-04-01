@@ -7,6 +7,7 @@
                     <Form ref="queryParams" :model="queryParams" inline :label-width="60" label-position="left">
                         <FormItem label="商户名称:">
                             <Select v-model="queryParams.payScene"
+                                    filterable
                                     style="width:140px">
                                 <Option v-for="item in paySceneList"
                                         :value="item.merchantId"
@@ -20,7 +21,7 @@
 
                 <Col span="6" :md="6" :sm="24" :xs="24">
                     <Button type="primary" @click="getListAction()">查询</Button>
-                    <Button type="primary">新增</Button>
+                    <Button type="primary" @click="detailAction('add')">新增</Button>
                 </Col>
             </Row>
         </Card>
@@ -44,6 +45,11 @@
                   @on-change="handleCurrentPageChange"
                   @on-page-size-change="handlePageSizeChange"></Page>
         </Card>
+
+        <Modal>
+
+            <Button type="primary">{{dialogButtonText}}</Button>
+        </Modal>
     </div>
 </template>
 
@@ -70,58 +76,9 @@
                 },
                 payScene: '',
                 paySceneList: [],
-                columnsTable: [
-                    {
-                        key: 'merchantName',
-                        title: '商户名称',
-                        align: 'center',
-                        width: 160,
-                        render: (h, params) => {
-                            return h('div', params.row.merchantName || '');
-                        }
-                    },
-                    {
-                        key: 'payeeId',
-                        title: '商户编号',
-                        align: 'center',
-                        width: 160,
-                        render: (h, params) => {
-                            return h('div', params.row.payeeId || '');
-                        }
-                    },
-                    {
-                        key: 'sceneName',
-                        title: '支付场景',
-                        align: 'center',
-                        width: 260,
-                        render: (h, params) => {
-                            return h('div', params.row.sceneName || '');
-                        }
-                    },
-                    {
-                        key: 'operate',
-                        title: '操作',
-                        align: 'center',
-                        width: 160,
-                        render: (h, params) => {
-                            return h('div',
-                                [h('Button', {
-                                    props: {
-                                        type: 'dashed',
-                                        size: 'small'
-                                    },
-                                    on: {
-                                        click: () => {
-                                            this.rowAction(params.row);
-                                        }
-                                    }
-                                }, '详情')
-                                ]);
-                        }
-                    },
-                ],
-                dataList: []
-
+                dataList: [],
+                dialogStatus: false,
+                dialogButtonText: ''
             });
         },
         created () {
@@ -191,7 +148,7 @@
             },
             getListAction () {
                 this.handleCurrentPageChange(1);
-                this.getSearchList();
+                this.getList();
             },
             handleRowChange (selection, row) {
                 this.multipleSelection = selection;
@@ -209,6 +166,16 @@
             },
             rowAction (row) {
                 console.log(row);
+            },
+            detailAction(status) {
+                this.dialogStatus = true;
+
+                if (status === 'add') {  // 新增逻辑
+                   this.dialogButtonText = '提交';
+                }
+                if (status === 'check') {  // 查看
+                    this.dialogButtonText = '关闭';
+                }
             }
         }
     };
