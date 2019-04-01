@@ -170,6 +170,14 @@
             handleSelectAll(status) {
                 this.$refs.table.selectAll(status);
             },
+            handlePageSizeChange(val) {
+                this.queryParams.limit = val;
+                this.getList();
+            },
+            handleCurrentPageChange(val) {
+                this.queryParams.page = val;
+                this.getList();
+            },
             search(data, argumentObj) {
                 let res = data;
                 let dataClone = data;

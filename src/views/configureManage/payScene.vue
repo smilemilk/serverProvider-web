@@ -2,24 +2,27 @@
     <div>
         <title-item text="支付配置" sizeType="small" class="margin-top-20"></title-item>
         <Card class="searchBox">
-            <Form ref="queryParams" :model="queryParams" inline :label-width="60" label-position="left">
-                <FormItem label="商户名称:">
-                    <Select v-model="queryParams.payScene"
-                            style="width:100px">
-                        <Option v-for="item in paySceneList" :value="item.merchantId" :key="item.merchantRealName">
-                            {{item.merchantRealName}}
-                        </Option>
-                    </Select>
-                </FormItem>
-            </Form>
-            <div>
-                <Row>
-                    <Col span="18" :md="18" :sm="24" :xs="24">
-                        <Button type="primary" @click="getListAction()">查询</Button>
-                        <Button type="primary" @click="getHangLink">新增</Button>
-                    </Col>
-                </Row>
-            </div>
+            <Row>
+                <Col span="18" :md="18" :sm="24" :xs="24">
+                    <Form ref="queryParams" :model="queryParams" inline :label-width="60" label-position="left">
+                        <FormItem label="商户名称:">
+                            <Select v-model="queryParams.payScene"
+                                    style="width:140px">
+                                <Option v-for="item in paySceneList"
+                                        :value="item.merchantId"
+                                        :key="item.merchantId">
+                                    {{item.merchantRealName}}
+                                </Option>
+                            </Select>
+                        </FormItem>
+                    </Form>
+                </Col>
+
+                <Col span="6" :md="6" :sm="24" :xs="24">
+                    <Button type="primary" @click="getListAction()">查询</Button>
+                    <Button type="primary">新增</Button>
+                </Col>
+            </Row>
         </Card>
         <Card>
             <Table
@@ -72,7 +75,7 @@
                         key: 'merchantName',
                         title: '商户名称',
                         align: 'center',
-                        width: 120,
+                        width: 160,
                         render: (h, params) => {
                             return h('div', params.row.merchantName || '');
                         }
@@ -81,7 +84,7 @@
                         key: 'payeeId',
                         title: '商户编号',
                         align: 'center',
-                        width: 120,
+                        width: 160,
                         render: (h, params) => {
                             return h('div', params.row.payeeId || '');
                         }
@@ -90,7 +93,7 @@
                         key: 'sceneName',
                         title: '支付场景',
                         align: 'center',
-                        width: 120,
+                        width: 260,
                         render: (h, params) => {
                             return h('div', params.row.sceneName || '');
                         }
@@ -117,7 +120,7 @@
                         }
                     },
                 ],
-                dataList:[]
+                dataList: []
 
             });
         },
@@ -196,8 +199,16 @@
             handleSelectAll (status) {
                 this.$refs.table.selectAll(status);
             },
-            rowAction(row) {
-                console.log(row)
+            handleCurrentPageChange (val) {
+                this.queryParams.page = val;
+                this.getList();
+            },
+            handlePageSizeChange (val) {
+                this.queryParams.limit = val;
+                this.getList();
+            },
+            rowAction (row) {
+                console.log(row);
             }
         }
     };
