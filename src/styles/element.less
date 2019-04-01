@@ -1,0 +1,99 @@
+.mine {
+  &Table {
+    &[class*="el-table"] {
+      overflow: visible;
+      th, td {
+        padding: 7px 0;
+        color: #495060;
+        border-bottom-color: #dddee1;
+        border-right-color: #dddee1;
+        min-height: 40px;
+      }
+      thead.is-group th {
+        background-color: #f8f8f9;
+      }
+      th {
+        div {
+          line-height: 1;
+        }
+      }
+      th {
+        overflow: visible;
+        .cell {
+          overflow: visible;
+          .mine-tableCell {
+            overflow: visible;
+          }
+        }
+        .mine-tableCell {
+          div {
+            white-space: normal;
+            overflow: visible;
+            padding-left: 0;
+            padding-right: 0;
+            &[class*="poptip-"] {
+              padding-left: 10px;
+              padding-right: 10px;
+            }
+            &[class*="poptip-rel"],
+            &[class*="poptip-inner"] {
+              padding-left: 0;
+              padding-right: 0;
+            }
+          }
+        }
+      }
+    }
+    &.el-table--border {
+      border-color: #dddee1;
+      th {
+        border-bottom-color: #dddee1;
+      }
+    }
+    &.el-table--group {
+      border-color: #dddee1;
+    }
+    .el-table__empty-text {
+      color: #495060;
+    }
+  }
+}
+
+.el-table .cell {
+  word-break: normal;
+  //line-height: 23px;
+}
+.el-table .cell, .el-table th div {
+  overflow: initial;
+  text-overflow: initial;
+}
+
+.el-table td.is-center.leftCell
+{
+  text-align: left;
+}
+
+.el-table--border td:first-child .cell, .el-table--border th:first-child .cell, .el-table .cell, .el-table th div {
+  padding-left: 2px !important;
+}
+.el-table .cell, .el-table th div {
+  padding-right: 2px !important;
+}
+
+@media screen and (max-height: 786px) {
+  .mine {
+    &Table {
+      &[class*="el-table"] {
+        th, td {
+          padding: 2px 0;
+          min-height: auto;
+        }
+        th {
+          .cell {
+            line-height: 16px;
+          }
+        }
+      }
+    }
+  }
+}

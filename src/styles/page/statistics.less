@@ -1,0 +1,119 @@
+// 对账弹框
+.operatorSection {
+  & > p {
+    background-color: @borderLighter;
+    margin-bottom: 0;
+    padding: 7px 0 7px 15px;
+    & + div {
+      padding-left: 15px;
+    }
+  }
+  .operateItem {
+    position: relative;
+    width: 116px;
+    height: 84px;
+    display: inline-block;
+    vertical-align: top;
+    padding: 5px 0;
+    margin-top: 15px;
+    border: 1px solid @borderLight;
+    border-radius: 4px;
+    text-align: center;
+    overflow: hidden;
+    &.borderDark {
+      border-color: @mainThemeBlueHover;
+      box-shadow: 0px 0px 3px @mainThemeBlue;
+    }
+    .operateContainer {
+      text-align: center;
+    }
+    i {
+      font-size: 23px;
+      color: @borderLight;
+    }
+    .dark {
+      color: @fontColor;
+      margin-top: 1px;
+    }
+    p {
+      font-size: 12px;
+      margin-top: 1px;
+      color: @borderLight;
+      &.operateName {
+        color: #495060;
+        font-size: 13px;
+        line-height: 13px;
+        min-height: 26px;
+      }
+    }
+    &.operatorEmpty {
+      .operateHover {
+        position: absolute;
+        top: 0;
+        left: 0;
+        display: flex;
+        flex-wrap: nowrap;
+        width: 116px;
+        align-items: center;
+        justify-content: center;
+        [class^="operateHover"] {
+          min-width: 58px;
+          height: 84px;
+          cursor: pointer;
+          i {
+            margin-top: 16px;
+            color: @borderLight;
+          }
+          p {
+            font-size: 12px;
+          }
+        }
+        .operateHoverPull {
+          background-color: rgba(55, 55, 55, .3);
+          &:hover {
+            background-color: rgba(55, 55, 55, .6);
+            i {
+              color: @backgroundSuccess;
+            }
+          }
+        }
+        .operateHoverPush {
+          background-color: rgba(55, 55, 55, .3);
+          &:hover {
+            background-color: rgba(55, 55, 55, .6);
+            i {
+              color: @backgroundWarn;
+            }
+          }
+        }
+      }
+    }
+    &.borderDark {
+      position: relative;
+      .deleteIcon {
+        display: inline-block;
+        position: absolute;
+        color: red;
+        top: 4px;
+        right: 8px;
+        cursor: pointer;
+        color: @backgroundDanger;
+      }
+      &:hover {
+        border-color: @backgroundDanger;
+        box-shadow: 0 0 3px @backgroundDanger;
+      }
+    }
+  }
+}
+.reconciliationsDialog {
+  .reconciliationsBottom {
+    height: 36px;
+    overflow: hidden;
+    text-align: left;
+    line-height: 36px;
+    label {
+      display: inline-block;
+    }
+  }
+}
