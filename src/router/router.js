@@ -216,6 +216,31 @@ export const appRouter = [
                 component: () => import('@/views/billOriginal/billTotal.vue')
             }
         ]
+    },
+    {
+        path: '/merchantManage',
+        icon: 'clipboard',
+        name: 'merchantManage',
+        title: '商户管理',
+        component: Layout,
+        children: [
+            {
+                path: 'list',
+                title: '商户列表',
+                name: 'merchantManageList',
+                icon: 'clipboard',
+                hide: false,
+                component: () => import('@/views/merchantManage/list.vue'),
+            },
+            {
+                path: 'register',
+                title: '商户注册',
+                name: 'merchantManageRegister',
+                icon: 'clipboard',
+                hide: false,
+                component: () => import('@/views/merchantManage/register.vue'),
+            }
+            ]
     }
 ];
 
