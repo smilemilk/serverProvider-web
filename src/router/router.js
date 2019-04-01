@@ -240,7 +240,32 @@ export const appRouter = [
                 hide: false,
                 component: () => import('@/views/merchantManage/register.vue'),
             }
-            ]
+        ]
+    },
+    {
+        path: '/configureManage',
+        icon: 'clipboard',
+        name: 'configureManage',
+        title: '配置管理',
+        component: Layout,
+        children: [
+            {
+                path: 'payScene',
+                title: '支付场景配置',
+                name: 'configurePayScene',
+                icon: 'clipboard',
+                hide: false,
+                component: () => import('@/views/configureManage/payScene.vue'),
+            },
+            // {
+            //     path: 'register',
+            //     title: '商户注册',
+            //     name: 'merchantManageRegister',
+            //     icon: 'clipboard',
+            //     hide: false,
+            //     component: () => import('@/views/configureManage/register.vue'),
+            // }
+        ]
     }
 ];
 

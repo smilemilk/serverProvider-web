@@ -22,9 +22,9 @@ module.exports = {
                 // target: 'http://192.168.3.236:8070/',  //甘松香ip
                 secure: false, // https域名
                 changeOrigin: true,
-                // pathRewrite: {
-                //     '^/unioncheck': ''
-                // }
+                pathRewrite: {
+                    '^/unioncheck': ''
+                }
             }
         },
 
