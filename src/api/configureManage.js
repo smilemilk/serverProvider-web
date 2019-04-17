@@ -23,7 +23,7 @@ export function sceneList(params) {
 
 export function submitScene (params) {
     return request({
-        url: util.ajaxFront + '/merchantPayScene/merchant/submitSceneInfo',
+        url: util.ajaxFront + '/payScene/submitSceneInfo',
         method: 'post',
         params: params,
         data: params

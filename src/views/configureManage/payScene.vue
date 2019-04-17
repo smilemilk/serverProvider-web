@@ -6,10 +6,9 @@
                 <Col span="18" :md="18" :sm="24" :xs="24">
                     <Form ref="queryParams" :model="queryParams" inline :label-width="60" label-position="left">
                         <FormItem label="商户名称:">
-                            <Select v-model="queryParams.payScene"
+                            <Select v-model="queryParams.payeeId"
                                     filterable
-                                    label-in-value
-                                    style="width:140px">
+                                    style="width:240px;">
                                 <Option v-for="item in paySceneList"
                                         :value="item.merchantId"
                                         :key="item.merchantId">
@@ -49,23 +48,29 @@
 
         <Modal
                 width="70%"
+                class="sceneOpera"
                 v-model="dialogShow"
+                :mask-closable=false
+                @on-cancel="cancelReset"
                 :styles="{top:'50%',overflowY: 'auto',maxHeight: '94%',transform: 'translateY(-50%) !important'}"
         >
             <h3 slot="header">支付场景配置</h3>
-            <Form ref="sceneform" :model="sceneform" :label-width="100" label-position="right"
+            <Form ref="sceneform"
+                  :model="sceneform"
+                  :label-width="100"
+                  label-position="right"
                   :rules="sceneValidate">
                 <FormItem label="商户名称:"
                           prop="merchant"
-                          :error="sceneValidate.merchant"
+                          required
                 >
-
                     <Select v-model="sceneform.merchant"
-                            on-change="merchantHandle"
                             filterable
                             placeholder="请选择商户"
+                            @on-change="merchantHandle"
                             label-in-value
-                            style="width:200px; margin-left: 15px;">
+                            :disabled="detailStatus"
+                            style="width:240px; margin-left: 15px;">
                         <Option v-for="(item, key) in merchantList"
                                 :value="item.merchantId"
                                 :key="key"
@@ -76,26 +81,36 @@
                     </Select>
                 </FormItem>
 
-                <CheckboxGroup v-model="sceneform.payScene">
-                <div v-for="item in paySceneItems">
-                    <Checkbox
-                            v-if="item.sceneName && item.paySceneId"
-                            :label="item.sceneName">
-                    {{item.sceneName}}
-                    </Checkbox>
-                </div>
+                <CheckboxGroup
+                        v-model="sceneform.payScene"
+                        class="sceneBox"
+                        @on-change="sceneHandle"
+                >
+                    <div
+                            v-for="item in paySceneItems"
+                            class="margin-top-8"
+                    >
+                        <Checkbox
+                                v-if="item.sceneName && item.paySceneId"
+                                :label="item.sceneName">
+                            {{item.sceneName}}
+                        </Checkbox>
+                    </div>
                 </CheckboxGroup>
             </Form>
             <div slot="footer">
                 <Button type="text"
-                        @click="cancelEditPass('sceneform')"
-                >取消</Button>
+                        @click="cancelAction('sceneform')"
+                >{{dialogCancelText}}
+                </Button>
                 <Button type="primary"
                         :loading="savePassLoading"
-                        @click="saveEditPass('sceneform')"
-                >{{dialogButtonText}}</Button>
+                        @click="saveAction('sceneform')"
+                >{{dialogButtonText}}
+                </Button>
             </div>
         </Modal>
+
     </div>
 </template>
 
@@ -116,7 +131,7 @@
                 loading: true,
                 tableHeight: 320,
                 queryParams: {
-                    payScene: 'all',
+                    payeeId: 'all',
                     page: 1,
                     limit: 20
                 },
@@ -127,16 +142,19 @@
                 dialogButtonText: '',
                 sceneform: {
                     merchant: '',
-                    payScene: ''
+                    merchantName: '',
+                    payScene: []
                 },
                 merchantList: [],
                 paySceneItems: [],
                 savePassLoading: false,
                 sceneValidate: {
-                    merchantError: [
+                    merchant: [
                         {required: true, message: '请选择商户', trigger: 'blur'}
                     ],
-                }
+                },
+                dialogCancelText: '取消',
+                detailStatus: false
             });
         },
         created () {
@@ -163,7 +181,10 @@
                 ajax.paySceneList({}).then(response => {
                     if (response.success == true) {
                         if (response.data) {
-                            this.paySceneList = response.data.list;
+                            this.paySceneList = [{
+                                'merchantId': 'all',
+                                'merchantRealName': '全部'
+                            }].concat(response.data.list);
                         }
                     } else {
                         this.paySceneList = [];
@@ -178,10 +199,16 @@
                 });
             },
             getList () {
-                if (this.queryParams.payScene === 'all') {
-                    this.queryParams.payScene = '';
+                let params;
+                if (this.queryParams.payeeId === 'all') {
+                    params = {
+                        ...this.queryParams,
+                        payeeId: ''
+                    };
+                } else {
+                    params = this.queryParams;
                 }
-                ajax.sceneList(this.queryParams).then(response => {
+                ajax.sceneList(params).then(response => {
                     if (response.success === true) {
                         this.loading = false;
                         if (response.data.items) {
@@ -209,7 +236,6 @@
             },
             getListAction () {
                 this.handleCurrentPageChange(1);
-                this.getList();
             },
             handleRowChange (selection, row) {
                 this.multipleSelection = selection;
@@ -226,41 +252,24 @@
                 this.getList();
             },
             rowAction (row) {
-                console.log(row);
+                this.sceneform.merchant = row.payeeId;
+                this.sceneform.payScene = row.sceneName.split(',');
+                this.merchantList = [{merchantId: row.payeeId, merchantRealName: row.merchantName}]
+                this.detailAction('check');
             },
-            detailAction(status) {
-                this.dialogHandle();
-
-
+            detailAction (status) {
+                this.dialogHandle(status);
 
                 if (status === 'add') {  // 新增逻辑
-                   this.dialogButtonText = '提交';
+                    this.dialogButtonText = '提交';
                 }
                 if (status === 'check') {  // 查看
-                    this.dialogButtonText = '关闭';
+                    this.dialogButtonText = '修改';
+                    this.dialogCancelText = '关闭';
                 }
             },
-            dialogHandle() {
+            dialogHandle (status) {
                 this.dialogShow = true;
-                ajax.merchantList({}).then(response => {
-                    console.log('---')
-                    if (response.success === true) {
-                        if (response.data.list) {
-                            console.log(response.data)
-                            this.merchantList = response.data.list;
-                        } else {
-                            this.merchantList = [];
-                        }
-                    } else {
-                        this.merchantList = [];
-                        this.$Message.error({
-                            content: response.msg ? response.msg : '商户列表请求未成功',
-                            duration: 2,
-                            closable: true
-                        });
-                    }
-                }).catch(() => {
-                });
 
                 ajax.payScene({}).then(response => {
                     if (response.success === true) {
@@ -279,10 +288,96 @@
                     }
                 }).catch(() => {
                 });
+                if (status && status === 'check') {
+                    this.detailStatus = true;
+                    return;
+                }
+
+                this.detailStatus = false;
+                ajax.merchantList({}).then(response => {
+                    if (response.success === true) {
+                        if (response.data.list) {
+                            this.merchantList = response.data.list;
+                        } else {
+                            this.merchantList = [];
+                        }
+                    } else {
+                        this.merchantList = [];
+                        this.$Message.error({
+                            content: response.msg ? response.msg : '商户列表请求未成功',
+                            duration: 2,
+                            closable: true
+                        });
+                    }
+                }).catch(() => {
+                });
+
             },
-            merchantHandle(item) {
-                console.log(item)
+            merchantHandle (item) {
+                if (item) {
+                    this.sceneform.merchant = item.value;
+                    this.sceneform.merchantName = item.label;
+                }
+            },
+            sceneHandle (item) {
+
+            },
+            saveAction (formName) {
+                this.savePassLoading = true;
+                this.$refs['sceneform'].validate((valid) => {
+                    if (valid === true) {
+                        if (this.sceneform.payScene.length === 0) {
+                            this.$message.error('请选择支付场景');
+                            this.savePassLoading = false;
+                            return;
+                        }
+                        let sceneListArr = [];
+                        this.sceneform.payScene.forEach(it => {
+                            let item = {
+                                'paySceneId': this.paySceneItems.filter(item=>item.sceneName===it)[0]['paySceneId'],
+                                'sceneName': it
+                            };
+                            sceneListArr.push(item);
+                        });
+
+                        ajax.submitScene({
+                            merchantName: this.sceneform.merchantName,
+                            payeeId: this.sceneform.merchant,
+                            sceneList: sceneListArr
+                        }).then(response => {
+                            if (response.success === true) {
+                                let vm = this;
+                                this.queryParams.payeeId = vm.sceneform.merchant;
+                                this.handleCurrentPageChange(1);
+                                this.cancelReset(formName);
+                            } else {
+                                this.$Message.error({
+                                    content: response.msg ? response.msg : '场景配置请求未成功',
+                                    duration: 2,
+                                    closable: true
+                                });
+                            }
+                        }).catch(() => {
+                        });
+                    } else {
+                        this.savePassLoading = false;
+                    }
+                });
+            },
+            cancelAction (formName) {
+                this.cancelReset(formName);
+            },
+            cancelReset (formName) {
+                if (this.$refs[formName]) {
+                    this.$refs[formName].resetFields();
+                } else {
+                    this.$refs['sceneform'].resetFields();
+                }
                 this.sceneform.merchant = '';
+                this.sceneform.payScene = [];
+                this.dialogShow = false;
+                this.savePassLoading = false;
+                this.paySceneItems = [];
             }
         }
     };
@@ -293,6 +388,15 @@
 
     .ivu-card {
         margin-bottom: 10px;
+    }
+
+    .sceneOpera {
+        .sceneBox {
+            width: 306px;
+            margin-left: 50px;
+            padding: 2px 0 10px 10px;
+            border: 1px solid @borderLighter;
+        }
     }
 
     @media screen and (max-height: 786px) {
