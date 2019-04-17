@@ -12,6 +12,14 @@
                                     {{item.value}}
                                 </Option>
                             </Select>
+
+                            <!--<i-input-->
+                                    <!--v-model="queryParams.amount"-->
+                                    <!--:value.sync="queryParams.amount"-->
+                                    <!--:disabled="disabledStatus"-->
+                                    <!--@keyup.native="amountKeyMounted"-->
+                                    <!--placeholder="请输入收款金额"-->
+                                    <!--class="large"></i-input>-->
                         </FormItem>
 
                         <FormItem label="申请日期:" prop="dateSearch">
@@ -72,14 +80,13 @@
                         </FormItem>
                     </div>
 
-
                 </Form>
             <div>
                 <Row>
                     <Col span="18" :md="18" :sm="24" :xs="24">
                         <Button type="primary" @click="getListAction()">返回</Button>
-                        <Button type="primary" @click="getHangLink">保存为草稿</Button>
-                        <Button type="primary" @click="exportAction">提交审核</Button>
+                        <Button type="primary">保存为草稿</Button>
+                        <Button type="primary">提交审核</Button>
                     </Col>
                 </Row>
             </div>

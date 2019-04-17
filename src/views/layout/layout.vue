@@ -270,7 +270,7 @@
         created () {
             // 显示打开的页面的列表
             this.$store.commit('setOpenedList');
-            this.lockScreen();
+            // this.lockScreen();
         }
     };
 </script>

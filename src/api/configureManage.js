@@ -30,8 +30,26 @@ export function submitScene (params) {
     });
 }
 
+export function merchantList (params) {
+    return request({
+        url: util.ajaxFront + '/payScene/queryUnSettingMerchants',
+        method: 'get',
+        params: params,
+    });
+}
+
+export function payScene (params) {
+    return request({
+        url: util.ajaxFront + '/payScene/queryOssAllPayScene',
+        method: 'get',
+        params: params,
+    });
+}
+
 export default {
     paySceneList,
     sceneList,
-    submitScene
+    submitScene,
+    merchantList,
+    payScene
 }
