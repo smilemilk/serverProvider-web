@@ -9,10 +9,10 @@ import ElementUI from 'element-ui';
 
 import locale from 'iview/dist/locale/zh-CN'
 import 'iview/dist/styles/iview.css';
-import 'iview/dist/styles/fonts/ionicons.eot';
 import 'iview/dist/styles/fonts/ionicons.svg';
 import 'iview/dist/styles/fonts/ionicons.ttf';
 import 'iview/dist/styles/fonts/ionicons.woff';
+import 'iview/dist/styles/fonts/ionicons.woff2';
 
 import localeEle from 'element-ui/lib/locale/lang/zh-CN';
 import 'element-ui/lib/theme-chalk/index.css';
