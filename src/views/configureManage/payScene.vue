@@ -1,8 +1,7 @@
 <template>
     <div>
-
         <wm-card title="支付配置"
-                 class="mb-10">
+                 class="margin-bottom-10">
 
             <Row>
                 <Col span="18" :md="18" :sm="24" :xs="24">

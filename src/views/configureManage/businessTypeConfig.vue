@@ -1,51 +1,53 @@
 <template>
     <div>
-        <title-item text="支付配置" sizeType="small" class="margin-top-20"></title-item>
-        <Card class="searchBox">
-            <Row>
-                <Col span="18" :md="18" :sm="24" :xs="24">
-                    <Form ref="queryParams" :model="queryParams" inline :label-width="60" label-position="left">
-                        <FormItem label="商户名称:">
-                            <Select v-model="queryParams.payeeId"
-                                    :filterable="selectFilterable"
-                                    @on-query-change="merchantFilterableHandle"
-                                    style="width:240px;">
-                                <Option v-for="item in paySceneList"
-                                        :value="item.merchantId"
-                                        :key="item.merchantId">
-                                    {{item.merchantRealName}}
-                                </Option>
-                            </Select>
-                        </FormItem>
-                    </Form>
-                </Col>
+        <wm-card title="业务类型管理"
+                 class="margin-bottom-10">
 
-                <Col span="6" :md="6" :sm="24" :xs="24">
-                    <Button type="primary" @click="getListAction()">查询</Button>
-                    <Button type="primary" @click="detailAction('add')">新增</Button>
+            <Row :gutter="10">
+                <Col span="6">
+                    <div class="bR1">
+                        <Form ref="queryParams" :model="queryParams" inline :label-width="60" label-position="left">
+                        <FormItem label="选择机构:">
+                            <Input style="width:166px"
+                                   v-model="queryParams.merchantId" placeholder="请输入机构"/>
+                        </FormItem>
+                        </Form>
+
+                        <merchant-select :merchant-list="merchantList">
+
+                        </merchant-select>
+                    </div>
+                </Col>
+                <Col span="18">
+                    <Row>
+                        <Col span="6" :md="6" :sm="24" :xs="24">
+                            <Button type="primary" @click="getListAction()">添加商户业务类型
+                            </Button>
+                        </Col>
+                    </Row>
+
+                    <Table
+                            ref="table"
+                            :loading="loading"
+                            :columns="columnsTable"
+                            :data="dataList"
+                            :height="tableHeight"
+                            highlight-row
+                            border
+                            @on-selection-change="handleRowChange"
+                    ></Table>
+                    <Page :total="total"
+                          size="small"
+                          show-total
+                          show-elevator
+                          show-sizer
+                          :current="this.queryParams.page"
+                          @on-change="handleCurrentPageChange"
+                          @on-page-size-change="handlePageSizeChange"></Page>
                 </Col>
             </Row>
-        </Card>
-        <Card>
-            <Table
-                    ref="table"
-                    :loading="loading"
-                    :columns="columnsTable"
-                    :data="dataList"
-                    :height="tableHeight"
-                    highlight-row
-                    border
-                    @on-selection-change="handleRowChange"
-            ></Table>
-            <Page :total="total"
-                  size="small"
-                  show-total
-                  show-elevator
-                  show-sizer
-                  :current="this.queryParams.page"
-                  @on-change="handleCurrentPageChange"
-                  @on-page-size-change="handlePageSizeChange"></Page>
-        </Card>
+
+        </wm-card>
 
         <Modal
                 width="70%"
@@ -118,18 +120,26 @@
 </template>
 
 <script>
-    import TitleItem from '_c/title/index';
+    import WmCard from '_c/card/card';
     import storeData from './store/payScene';
     import {parseTime} from '@/filters';
     import ajax from '@/api/configureManage';
+    import MerchantSelect from './select/select'
 
     export default {
-        name: 'payScene',
+        name: 'businessTypeConfig',
         components: {
-            TitleItem
+            WmCard,
+            MerchantSelect
         },
         data () {
             return Object.assign({}, storeData.call(this), {
+                queryParams: {
+                    merchantId: ''
+                },
+                merchantList: [],
+
+
                 total: 0,
                 loading: true,
                 tableHeight: 320,
@@ -152,7 +162,6 @@
                     merchantName: '',
                     payScene: []
                 },
-                merchantList: [],
                 paySceneItems: [],
                 savePassLoading: false,
                 sceneValidate: {
@@ -165,12 +174,13 @@
             });
         },
         created () {
+            this.getMerchantList();
             this.getPayScene();
             this.getList();
         },
         mounted () {
             let maxHeight = window.innerHeight - this.$refs.table.$el.offsetTop
-                - document.querySelector('.main-header-con').clientHeight - document.querySelector('.searchBox').clientHeight - 44;
+                 - 44;
             let tableCount;
             if (window.screen.availHeight < 768) {
                 tableCount = 32 * 11;
@@ -183,6 +193,21 @@
             this.tableHeight = maxHeight;
         },
         methods: {
+
+
+
+            getMerchantList () {
+        ajax.merchants({
+
+        }).then(response => {
+            if (response.success == true) {
+                this.merchantList = response.data.items;
+            } else {
+                this.merchantList = [];
+            }
+        }).catch(() => {
+        });
+    },
 
             getPayScene () {
                 ajax.paySceneList({}).then(response => {
@@ -410,7 +435,7 @@
             width: 306px;
             margin-left: 50px;
             padding: 2px 0 10px 10px;
-            border: 1px solid @borderLighter;
+            border: 1px solid @border-theme;
         }
     }
 

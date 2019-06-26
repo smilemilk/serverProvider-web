@@ -424,7 +424,7 @@
 </script>
 
 <style lang="less" scoped>
-    @import "../../styles/common";
+    @import "../../styles/themeType";
     .userLoginForm {
         span {
             font-size: 12px;
@@ -442,7 +442,7 @@
     }
 
     .emFont {
-        color: @mainThemeBlue;
+        color: @main-theme-color;
     }
 
     .own-space {
@@ -484,7 +484,7 @@
         }
     }
     .tipText {
-        color: @fontColorLight;
+        color: @font-light;
         margin-top: 15px;
         padding-left: 30px;
         font-size: 12px;

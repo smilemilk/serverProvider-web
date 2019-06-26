@@ -49,7 +49,7 @@
         line-height: 1;
         padding: 0px 10px;
         box-sizing: border-box;
-        border-left: 4px solid @mainThemeBlue;
+        border-left: 4px solid @main-theme-color;
         margin: 25px 5px 20px;
         &.title-item-small {
             border-left-width: 3px;
@@ -58,8 +58,8 @@
             margin-bottom: 10px;
         }
         &.title-item-light {
-            color: @fontColorLight;
-            border-left-color: @mainThemeBlueLightest;
+            color: @font-light;
+            border-left-color: @main-theme-blueLighter;
         }
     }
 

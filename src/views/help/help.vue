@@ -207,12 +207,12 @@
                 &.list-title {
                     text-align: center;
                     border-bottom-style: solid;
-                    color: @fontColor;
-                    font-size: @fontSize;
+                    color: @font-color;
+                    font-size: @font-normal;
                 }
                 &.list-link {
                     [class*="text"] {
-                        color: @mainThemeBlue;
+                        color: @main-theme-color;
                     }
                 }
                 &:last-child {
@@ -221,7 +221,7 @@
             }
             .active {
                 button {
-                    background-color: @mainThemeBlue;
+                    background-color: @main-theme-color;
                     .mes-type-btn-text {
                         color: #fff;
 
@@ -258,7 +258,7 @@
           padding: 20px;
             h3 {
                 text-align: center;
-                font-size: @fontSize;
+                font-size: @font-normal;
                 padding: 12px 0 10px;
             }
             h4 {
@@ -275,13 +275,13 @@
                 background-size: 100% auto;
             }
             table {
-                border: 1px solid @borderLighter;
+                border: 1px solid @border-theme;
                 border-collapse: collapse;
                 padding: 0;
                 thead {
-                    border-bottom: 1px solid @mainThemeBlueHover;
+                    border-bottom: 1px solid @main-theme-blueLighter;
                     td {
-                        background-color: @mainThemeBlueHover;
+                        background-color: @main-theme-blueLighter;
                         padding: 5px 0;
                     }
                 }
@@ -292,10 +292,10 @@
                     tr {
                         td{
                             &:nth-child(1) {
-                                border-right: 1px solid @borderLighter;
+                                border-right: 1px solid @border-theme;
                             }
                         }
-                        border-bottom: 1px solid @borderLighter;
+                        border-bottom: 1px solid @border-theme;
                         &:last-child {
                             border-bottom: none;
                         }
@@ -310,7 +310,7 @@
         }
         &-item-title {
             padding: 7px 0;
-            border-bottom: 1px solid @borderLighter;
+            border-bottom: 1px solid @border-theme;
             i {
                 margin-right: 5px;
             }
@@ -321,10 +321,10 @@
         }
     }
     .dark {
-        color: @mainThemeBlueHoverDark !important;
+        color: @font-dark !important;
     }
     .danger {
-        color: @backgroundDanger !important;
+        color: @red !important;
     }
 
     @media screen and (max-width: 1200px) {

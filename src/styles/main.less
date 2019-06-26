@@ -253,7 +253,7 @@
   form {
     & + div {
       padding-top: 12px;
-      border-top: 1px solid @borderLight;
+      border-top: 1px solid @border-theme;
     }
   }
   .dateSearchQuick {
@@ -266,7 +266,7 @@
       margin: 0 5px 0 25px;
       padding: 0 5px;
       &.active {
-        background-color: @mainThemeBlueLightest;
+        background-color: @main-theme-blueLighter;
         border-radius: 5px;
       }
       &:nth-child(2) {
@@ -302,7 +302,7 @@
 
 .table-format {
   width: 100%;
-  border: 1px solid @borderLight;
+  border: 1px solid @border-theme;
   border-collapse: collapse;
   dd span, dt li span {
     //text-align: center;
@@ -324,15 +324,15 @@
   }
   dd {
     span:not(last-child) {
-      border-right: 1px solid @borderLight;
+      border-right: 1px solid @border-theme;
     }
   }
   dt {
     ul {
       li {
-        border-top: 1px solid @borderLight;
+        border-top: 1px solid @border-theme;
         span:not(last-child) {
-          border-right: 1px solid @borderLight;
+          border-right: 1px solid @border-theme;
         }
       }
     }
@@ -359,19 +359,19 @@
   }
   // 装饰
   &-format-decoration {
-    border: 1px solid @borderLight;
+    border: 1px solid @border-theme;
     .table {
       &-item {
         &-header {
-          border-bottom: 1px solid @borderLight;
+          border-bottom: 1px solid @border-theme;
         }
         &-cell {
           &:not(:last-child) {
-            border-right: 1px solid @borderLight;
+            border-right: 1px solid @border-theme;
           }
         }
         &:not(:last-child) {
-          border-bottom: 1px solid @borderLight;
+          border-bottom: 1px solid @border-theme;
         }
         &-none {
           height: 50px;
@@ -435,8 +435,8 @@ h3.hTitle {
 .ivu-table .ivu-table-row.row-grey td,
 .ivu-table .ivu-table-row-highlight.ivu-table-row.row-grey td,
 .ivu-table .ivu-table-row-highlight.ivu-table-row-hover.ivu-table-row.row-grey td{
-  background-color: @borderLighter !important;
-  color: @fontColorLight;
+  background-color: @border-theme !important;
+  color: @border-theme;
 }
 .ivu-table .row-bold td {
   font-weight: 500;

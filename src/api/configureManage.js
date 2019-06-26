@@ -3,6 +3,22 @@
 import request from '@/libs/request'
 import util from '@/libs/util';
 
+export function merchants (params) {
+    return request({
+        url: util.ajaxFront + '/merchantBizType/queryMerchants',
+        method: 'get',
+        params: params
+    });
+}
+export function merchantListLimit (params) {
+    return request({
+        url: util.ajaxFront + '/merchantBizType/queryMerchantBizTypeWithPage',
+        method: 'get',
+        params: params
+    });
+}
+
+
 export function paySceneList (params) {
     return request({
         url: util.ajaxFront + '/payScene/queryMerchants',
@@ -47,6 +63,9 @@ export function payScene (params) {
 }
 
 export default {
+    merchants,
+    merchantListLimit,
+
     paySceneList,
     sceneList,
     submitScene,

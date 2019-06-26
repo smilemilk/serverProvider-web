@@ -98,14 +98,14 @@ export const appRouter = [
                 hide: false,
                 component: () => import('@/views/configureManage/payScene.vue'),
             },
-            // {
-            //     path: 'register',
-            //     title: '商户注册',
-            //     name: 'merchantManageRegister',
-            //     icon: 'clipboard',
-            //     hide: false,
-            //     component: () => import('@/views/configureManage/register.vue'),
-            // }
+            {
+                path: 'businessTypeConfig',
+                title: '业务类型管理',
+                name: 'businessTypeConfig',
+                icon: 'clipboard',
+                hide: false,
+                component: () => import('@/views/configureManage/businessTypeConfig.vue'),
+            }
         ]
     }
 ];
