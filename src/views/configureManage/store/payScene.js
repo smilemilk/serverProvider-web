@@ -39,7 +39,7 @@ export default function () {
                     return h('div',
                         [h('Button', {
                             props: {
-                                type: 'dashed',
+                                type: 'primary',
                                 size: 'small'
                             },
                             on: {

@@ -18,8 +18,7 @@
 </script>
 
 <style lang="less" scoped>
-    @import "../../styles/common";
 
-    @media screen and (max-height: 786px) {
+    @media screen and (max-height: 767px) {
     }
 </style>

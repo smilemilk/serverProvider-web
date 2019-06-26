@@ -1,9 +1,7 @@
 <template>
     <div>
-
-        <wm-card title="支付配置"
-                 class="mb-10">
-
+        <title-item text="支付配置" sizeType="small" class="margin-top-20"></title-item>
+        <Card class="searchBox">
             <Row>
                 <Col span="18" :md="18" :sm="24" :xs="24">
                     <Form ref="queryParams" :model="queryParams" inline :label-width="60" label-position="left">
@@ -23,11 +21,12 @@
                 </Col>
 
                 <Col span="6" :md="6" :sm="24" :xs="24">
-                    <Button type="primary" @click="getListAction()" class="margin-right-15">查询</Button>
+                    <Button type="primary" @click="getListAction()">查询</Button>
                     <Button type="primary" @click="detailAction('add')">新增</Button>
                 </Col>
             </Row>
-
+        </Card>
+        <Card>
             <Table
                     ref="table"
                     :loading="loading"
@@ -46,7 +45,7 @@
                   :current="this.queryParams.page"
                   @on-change="handleCurrentPageChange"
                   @on-page-size-change="handlePageSizeChange"></Page>
-        </wm-card>
+        </Card>
 
         <Modal
                 width="70%"
@@ -119,7 +118,7 @@
 </template>
 
 <script>
-    import WmCard from '_c/card/card';
+    import TitleItem from '_c/title/index';
     import storeData from './store/payScene';
     import {parseTime} from '@/filters';
     import ajax from '@/api/configureManage';
@@ -127,7 +126,7 @@
     export default {
         name: 'payScene',
         components: {
-            WmCard
+            TitleItem
         },
         data () {
             return Object.assign({}, storeData.call(this), {
@@ -171,7 +170,7 @@
         },
         mounted () {
             let maxHeight = window.innerHeight - this.$refs.table.$el.offsetTop
-                - document.querySelector('.main-header-con').clientHeight - 44;
+                - document.querySelector('.main-header-con').clientHeight - document.querySelector('.searchBox').clientHeight - 44;
             let tableCount;
             if (window.screen.availHeight < 768) {
                 tableCount = 32 * 11;
@@ -262,7 +261,7 @@
             rowAction (row) {
                 this.sceneform.merchant = row.payeeId;
                 this.sceneform.payScene = row.sceneName.split(',');
-                this.merchantList = [{merchantId: row.payeeId, merchantRealName: row.merchantName}];
+                this.merchantList = [{merchantId: row.payeeId, merchantRealName: row.merchantName}]
                 this.detailAction('check');
             },
             detailAction (status) {
@@ -342,7 +341,7 @@
                         let sceneListArr = [];
                         this.sceneform.payScene.forEach(it => {
                             let item = {
-                                'paySceneId': this.paySceneItems.filter(item => item.sceneName === it)[0]['paySceneId'],
+                                'paySceneId': this.paySceneItems.filter(item=>item.sceneName===it)[0]['paySceneId'],
                                 'sceneName': it
                             };
                             sceneListArr.push(item);
@@ -389,10 +388,10 @@
                 this.selectFilterable_dialog = false;
             },
 
-            merchantFilterableHandle () {
+            merchantFilterableHandle() {
                 this.selectFilterable = true;
             },
-            merchantFilterableHandle_dialog () {
+            merchantFilterableHandle_dialog() {
                 this.selectFilterable_dialog = true;
             }
         }
@@ -402,7 +401,22 @@
 <style lang="less" scoped>
     @import "../../styles/common";
 
-    @media screen and (max-height: 767px) {
+    .ivu-card {
+        margin-bottom: 10px;
+    }
 
+    .sceneOpera {
+        .sceneBox {
+            width: 306px;
+            margin-left: 50px;
+            padding: 2px 0 10px 10px;
+            border: 1px solid @borderLighter;
+        }
+    }
+
+    @media screen and (max-height: 786px) {
+        .operatorSection .operateItem p.operateName {
+            font-size: 12px;
+        }
     }
 </style>
