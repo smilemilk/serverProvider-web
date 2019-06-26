@@ -7,7 +7,7 @@ export default function () {
                 key: 'merchantName',
                 title: '商户名称',
                 align: 'center',
-                width: 160,
+                minWidth: 160,
                 render: (h, params) => {
                     return h('div', params.row.merchantName || '');
                 }
@@ -16,7 +16,7 @@ export default function () {
                 key: 'payeeId',
                 title: '商户编号',
                 align: 'center',
-                width: 160,
+                minWidth: 160,
                 render: (h, params) => {
                     return h('div', params.row.payeeId || '');
                 }
@@ -25,7 +25,7 @@ export default function () {
                 key: 'sceneName',
                 title: '支付场景',
                 align: 'center',
-                width: 260,
+                minWidth: 260,
                 render: (h, params) => {
                     return h('div', params.row.sceneName || '');
                 }
@@ -34,7 +34,7 @@ export default function () {
                 key: 'operate',
                 title: '操作',
                 align: 'center',
-                width: 160,
+                minWidth: 160,
                 render: (h, params) => {
                     return h('div',
                         [h('Button', {

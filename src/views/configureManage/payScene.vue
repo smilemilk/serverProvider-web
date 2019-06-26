@@ -7,7 +7,8 @@
                     <Form ref="queryParams" :model="queryParams" inline :label-width="60" label-position="left">
                         <FormItem label="商户名称:">
                             <Select v-model="queryParams.payeeId"
-                                    filterable
+                                    :filterable="selectFilterable"
+                                    @on-query-change="merchantFilterableHandle"
                                     style="width:240px;">
                                 <Option v-for="item in paySceneList"
                                         :value="item.merchantId"
@@ -52,7 +53,7 @@
                 v-model="dialogShow"
                 :mask-closable=false
                 @on-cancel="cancelReset"
-                :styles="{top:'50%',overflowY: 'auto',maxHeight: '94%',transform: 'translateY(-50%) !important'}"
+                :styles="{top:'50%',overflowY: 'auto',maxHeight: '94%',transform: 'translateY(-50%) !important', width: '480px'}"
         >
             <h3 slot="header">支付场景配置</h3>
             <Form ref="sceneform"
@@ -70,11 +71,13 @@
                             @on-change="merchantHandle"
                             label-in-value
                             :disabled="detailStatus"
+                            @on-query-change="merchantFilterableHandle_dialog"
                             style="width:240px; margin-left: 15px;">
                         <Option v-for="(item, key) in merchantList"
                                 :value="item.merchantId"
                                 :key="key"
                                 v-if="item.merchantRealName && item.merchantId"
+                                :label.trim="item.merchantRealName"
                         >
                             {{item.merchantRealName}}
                         </Option>
@@ -138,6 +141,10 @@
                 payScene: '',
                 paySceneList: [],
                 dataList: [],
+
+                selectFilterable: false,
+                selectFilterable_dialog: false,
+
                 dialogShow: false,
                 dialogButtonText: '',
                 sceneform: {
@@ -341,7 +348,7 @@
                         });
 
                         ajax.submitScene({
-                            merchantName: this.sceneform.merchantName,
+                            merchantName: this.sceneform.merchantName.trim(),
                             payeeId: this.sceneform.merchant,
                             sceneList: sceneListArr
                         }).then(response => {
@@ -378,6 +385,14 @@
                 this.dialogShow = false;
                 this.savePassLoading = false;
                 this.paySceneItems = [];
+                this.selectFilterable_dialog = false;
+            },
+
+            merchantFilterableHandle() {
+                this.selectFilterable = true;
+            },
+            merchantFilterableHandle_dialog() {
+                this.selectFilterable_dialog = true;
             }
         }
     };

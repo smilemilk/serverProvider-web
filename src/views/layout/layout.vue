@@ -2,7 +2,7 @@
     <div>
         <div class="main" :class="{'main-hide-text': shrink}">
             <div class="sidebar-menu-con"
-                 :style="{width: shrink?'60px':'200px', overflow: shrink ? 'visible' : 'auto'}">
+                 :style="{width: shrink?'60px':'200px', overflow: shrink ? 'visible' : 'hidden'}">
                 <!--<scroll-bar ref="scrollBar">-->
                     <shrinkable-menu
                             :shrink="shrink"
@@ -102,7 +102,7 @@
         data () {
             return {
                 alertWelcome: true,
-                shrink: true,
+                shrink: false,
                 userName: '',
                 lockStatus: false,
                 openedSubmenuArr: this.$store.state.app.openedSubmenuArr,
