@@ -17,7 +17,13 @@ export function merchantListLimit (params) {
         params: params
     });
 }
-
+export function systemBis (params) {
+    return request({
+        url: util.ajaxFront + '/merchantBizType/querySysBizType',
+        method: 'get',
+        params: params
+    });
+}
 
 export function paySceneList (params) {
     return request({
@@ -62,9 +68,11 @@ export function payScene (params) {
     });
 }
 
+
 export default {
     merchants,
     merchantListLimit,
+    systemBis,
 
     paySceneList,
     sceneList,

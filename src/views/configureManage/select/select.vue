@@ -1,8 +1,13 @@
 <template>
     <div class="merchant-select-wrapper">
-        <ul v-if="merchantList">
+        <ul v-if="list">
             <li v-for="
-                    item in merchantList">
+                    (item,key) in list"
+                :key="key"
+                class="select-item"
+                @click="merchantHandle(item)"
+                :class="item.active ? 'active' : ''"
+            >
                 {{item.merchantName}}
             </li>
         </ul>
@@ -22,13 +27,44 @@
         data () {
             return {};
         },
+        computed:{
+            list: {
+                get: function(){
+                    this.merchantList.forEach((it,key)=>{
+                        if (key === 0) {
+                            this.$set(it, 'active', true);
+                        } else {
+                            this.$set(it, 'active', false);
+                        }
+                        return it;
+                    });
+                    return this.merchantList;
+                },
+                set: function(newValue) {
+                  return newValue;
+                }
+            }
+        },
         created () {
 
         },
         mounted () {
 
         },
-        methods: {}
+        methods: {
+            merchantHandle(item) {
+                const list = this.merchantList;
+                this.list = list.forEach(it=>{
+                    if (it.merchantId === item.merchantId) {
+                        this.$set(it, 'active', true);
+                    } else {
+                        this.$set(it, 'active', false);
+                    }
+                    return it;
+                });
+                this.$emit('on-change', item);
+            }
+        }
     };
 </script>
 
@@ -38,10 +74,26 @@
     .merchant-select-wrapper {
         border: 1px solid @border-theme;
         border-radius: 2px;
-        height: 370px;
+        width: 226px;
+        height: 352px;
+        padding: 3px;
         .empty {
             margin-top: 30vh;
             text-align: center;
+        }
+        .select {
+            &-item {
+                padding: 8px 0 7px 3px;
+                border-bottom: 1px solid @border-theme;
+                cursor: pointer;
+                &:hover {
+                    color: @main-theme-color;
+                }
+                &.active {
+                    color: @main-theme-color;
+                    background-color: @main-theme-blueLighter;
+                }
+            }
         }
     }
     @media screen and (max-height: 767px) {

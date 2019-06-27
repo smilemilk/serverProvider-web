@@ -3,29 +3,27 @@
         <wm-card title="业务类型管理"
                  class="margin-bottom-10">
 
-            <Row :gutter="10">
-                <Col span="6">
-                    <div class="bR1">
-                        <Form ref="queryParams" :model="queryParams" inline :label-width="60" label-position="left">
+            <div class="flex-content flex-content-start">
+                <div class="border-right-dashed margin-right-10">
+                    <Form ref="queryMerchant" :model="queryMerchant" inline :label-width="60" label-position="left">
                         <FormItem label="选择机构:">
                             <Input style="width:166px"
-                                   v-model="queryParams.merchantId" placeholder="请输入机构"/>
+                                   v-model="queryMerchant.merchantName" placeholder="请输入机构"/>
                         </FormItem>
-                        </Form>
+                    </Form>
 
-                        <merchant-select :merchant-list="merchantList">
+                    <merchant-select
+                            :merchant-list="merchantList"
+                            @on-change="merchantCurrentHandle"
+                    >
+                    </merchant-select>
+                </div>
 
-                        </merchant-select>
-                    </div>
-                </Col>
-                <Col span="18">
-                    <Row>
-                        <Col span="6" :md="6" :sm="24" :xs="24">
-                            <Button type="primary" @click="getListAction()">添加商户业务类型
-                            </Button>
-                        </Col>
-                    </Row>
+                <div>
+                    <Button type="primary" @click="addAction()" class="margin-bottom-10">添加商户业务类型
+                    </Button>
 
+                    <div class="margin-bottom-5 margin-top-5">已添加列表</div>
                     <Table
                             ref="table"
                             :loading="loading"
@@ -44,109 +42,49 @@
                           :current="this.queryParams.page"
                           @on-change="handleCurrentPageChange"
                           @on-page-size-change="handlePageSizeChange"></Page>
-                </Col>
-            </Row>
+                </div>
 
+            </div>
         </wm-card>
 
-        <Modal
-                width="70%"
-                class="sceneOpera"
-                v-model="dialogShow"
-                :mask-closable=false
-                @on-cancel="cancelReset"
-                :styles="{top:'50%',overflowY: 'auto',maxHeight: '94%',transform: 'translateY(-50%) !important', width: '480px'}"
+        <modal-oper
+                ref="merchantModal"
         >
-            <h3 slot="header">支付场景配置</h3>
-            <Form ref="sceneform"
-                  :model="sceneform"
-                  :label-width="100"
-                  label-position="right"
-                  :rules="sceneValidate">
-                <FormItem label="商户名称:"
-                          prop="merchant"
-                          required
-                >
-                    <Select v-model="sceneform.merchant"
-                            filterable
-                            placeholder="请选择商户"
-                            @on-change="merchantHandle"
-                            label-in-value
-                            :disabled="detailStatus"
-                            @on-query-change="merchantFilterableHandle_dialog"
-                            style="width:240px; margin-left: 15px;">
-                        <Option v-for="(item, key) in merchantList"
-                                :value="item.merchantId"
-                                :key="key"
-                                v-if="item.merchantRealName && item.merchantId"
-                                :label.trim="item.merchantRealName"
-                        >
-                            {{item.merchantRealName}}
-                        </Option>
-                    </Select>
-                </FormItem>
 
-                <CheckboxGroup
-                        v-model="sceneform.payScene"
-                        class="sceneBox"
-                        @on-change="sceneHandle"
-                >
-                    <div
-                            v-for="item in paySceneItems"
-                            class="margin-top-8"
-                    >
-                        <Checkbox
-                                v-if="item.sceneName && item.paySceneId"
-                                :label="item.sceneName">
-                            {{item.sceneName}}
-                        </Checkbox>
-                    </div>
-                </CheckboxGroup>
-            </Form>
-            <div slot="footer">
-                <Button type="text"
-                        @click="cancelAction('sceneform')"
-                >{{dialogCancelText}}
-                </Button>
-                <Button type="primary"
-                        :loading="savePassLoading"
-                        @click="saveAction('sceneform')"
-                >{{dialogButtonText}}
-                </Button>
-            </div>
-        </Modal>
+        </modal-oper>
 
     </div>
 </template>
 
 <script>
     import WmCard from '_c/card/card';
-    import storeData from './store/payScene';
+    import storeData from './store/businessTypeConfig';
     import {parseTime} from '@/filters';
     import ajax from '@/api/configureManage';
-    import MerchantSelect from './select/select'
+    import MerchantSelect from './select/select';
+    import ModalOper from './businessTypeConfig/modalOper';
 
     export default {
         name: 'businessTypeConfig',
         components: {
             WmCard,
-            MerchantSelect
+            MerchantSelect,
+            ModalOper
         },
         data () {
             return Object.assign({}, storeData.call(this), {
-                queryParams: {
-                    merchantId: ''
+                queryMerchant: {
+                    merchantName: ''
                 },
                 merchantList: [],
-
 
                 total: 0,
                 loading: true,
                 tableHeight: 320,
                 queryParams: {
-                    payeeId: 'all',
+                    merchantId: 'all',
                     page: 1,
-                    limit: 20
+                    limit: 10
                 },
                 payScene: '',
                 paySceneList: [],
@@ -154,33 +92,14 @@
 
                 selectFilterable: false,
                 selectFilterable_dialog: false,
-
-                dialogShow: false,
-                dialogButtonText: '',
-                sceneform: {
-                    merchant: '',
-                    merchantName: '',
-                    payScene: []
-                },
-                paySceneItems: [],
-                savePassLoading: false,
-                sceneValidate: {
-                    merchant: [
-                        {required: true, message: '请选择商户', trigger: 'blur'}
-                    ],
-                },
-                dialogCancelText: '取消',
-                detailStatus: false
             });
         },
         created () {
-            this.getMerchantList();
-            this.getPayScene();
             this.getList();
         },
         mounted () {
             let maxHeight = window.innerHeight - this.$refs.table.$el.offsetTop
-                 - 44;
+                - 44;
             let tableCount;
             if (window.screen.availHeight < 768) {
                 tableCount = 32 * 11;
@@ -191,23 +110,43 @@
                 maxHeight = tableCount;
             }
             this.tableHeight = maxHeight;
+
+            Promise.all([this.getMerchantList()]).then((results)=>{
+                if (results&&results[0]&&results[0][0])
+                this.merchantCurrentHandle(results[0][0]);
+                this.queryParams.merchantId = results[0][0]['merchantId'];
+                this.getList();
+            });
         },
         methods: {
-
-
-
             getMerchantList () {
-        ajax.merchants({
+                return new Promise((resolve, reject)=>{
+                    ajax.merchants({}).then(response => {
+                        if (response.success == true) {
+                            this.merchantList = response.data.items;
+                        } else {
+                            this.merchantList = [];
+                        }
+                        return resolve(response.data.items || []);
+                    }).catch(() => {
+                        return reject({});
+                    });
+                }).catch(()=>{
+                });
+            },
+            merchantCurrentHandle(item) {
+                this.queryMerchant.merchantName = item.merchantName;
 
-        }).then(response => {
-            if (response.success == true) {
-                this.merchantList = response.data.items;
-            } else {
-                this.merchantList = [];
-            }
-        }).catch(() => {
-        });
-    },
+                this.queryParams.merchantId = item.merchantId;
+                if (this.queryParams.page !== 1) {
+                    this.queryParams = {
+                        ...this.queryParams,
+                        page: 1
+                    }
+                }
+
+                this.getList();
+            },
 
             getPayScene () {
                 ajax.paySceneList({}).then(response => {
@@ -231,16 +170,7 @@
                 });
             },
             getList () {
-                let params;
-                if (this.queryParams.payeeId === 'all') {
-                    params = {
-                        ...this.queryParams,
-                        payeeId: ''
-                    };
-                } else {
-                    params = this.queryParams;
-                }
-                ajax.sceneList(params).then(response => {
+                ajax.merchantListLimit(this.queryParams).then(response => {
                     if (response.success === true) {
                         this.loading = false;
                         if (response.data.items) {
@@ -284,141 +214,14 @@
                 this.getList();
             },
             rowAction (row) {
-                this.sceneform.merchant = row.payeeId;
-                this.sceneform.payScene = row.sceneName.split(',');
-                this.merchantList = [{merchantId: row.payeeId, merchantRealName: row.merchantName}]
+                this.merchantform.merchantId = row.payeeId;
+                this.merchantform.merchantName = row.sceneName.split(',');
+                this.merchantList = [{merchantId: row.payeeId, merchantRealName: row.merchantName}];
                 this.detailAction('check');
             },
-            detailAction (status) {
-                this.dialogHandle(status);
-
-                if (status === 'add') {  // 新增逻辑
-                    this.dialogButtonText = '提交';
-                }
-                if (status === 'check') {  // 查看
-                    this.dialogButtonText = '修改';
-                    this.dialogCancelText = '关闭';
-                }
+            addAction (status) {
+                this.$refs.merchantModal.show();
             },
-            dialogHandle (status) {
-                this.dialogShow = true;
-
-                ajax.payScene({}).then(response => {
-                    if (response.success === true) {
-                        if (response.data.items) {
-                            this.paySceneItems = response.data.items;
-                        } else {
-                            this.paySceneItems = [];
-                        }
-                    } else {
-                        this.paySceneItems = [];
-                        this.$Message.error({
-                            content: response.msg ? response.msg : '场景配置请求未成功',
-                            duration: 2,
-                            closable: true
-                        });
-                    }
-                }).catch(() => {
-                });
-                if (status && status === 'check') {
-                    this.detailStatus = true;
-                    return;
-                }
-
-                this.detailStatus = false;
-                ajax.merchantList({}).then(response => {
-                    if (response.success === true) {
-                        if (response.data.list) {
-                            this.merchantList = response.data.list;
-                        } else {
-                            this.merchantList = [];
-                        }
-                    } else {
-                        this.merchantList = [];
-                        this.$Message.error({
-                            content: response.msg ? response.msg : '商户列表请求未成功',
-                            duration: 2,
-                            closable: true
-                        });
-                    }
-                }).catch(() => {
-                });
-
-            },
-            merchantHandle (item) {
-                if (item) {
-                    this.sceneform.merchant = item.value;
-                    this.sceneform.merchantName = item.label;
-                }
-            },
-            sceneHandle (item) {
-
-            },
-            saveAction (formName) {
-                this.savePassLoading = true;
-                this.$refs['sceneform'].validate((valid) => {
-                    if (valid === true) {
-                        if (this.sceneform.payScene.length === 0) {
-                            this.$message.error('请选择支付场景');
-                            this.savePassLoading = false;
-                            return;
-                        }
-                        let sceneListArr = [];
-                        this.sceneform.payScene.forEach(it => {
-                            let item = {
-                                'paySceneId': this.paySceneItems.filter(item=>item.sceneName===it)[0]['paySceneId'],
-                                'sceneName': it
-                            };
-                            sceneListArr.push(item);
-                        });
-
-                        ajax.submitScene({
-                            merchantName: this.sceneform.merchantName.trim(),
-                            payeeId: this.sceneform.merchant,
-                            sceneList: sceneListArr
-                        }).then(response => {
-                            if (response.success === true) {
-                                let vm = this;
-                                this.queryParams.payeeId = vm.sceneform.merchant;
-                                this.handleCurrentPageChange(1);
-                                this.cancelReset(formName);
-                            } else {
-                                this.$Message.error({
-                                    content: response.msg ? response.msg : '场景配置请求未成功',
-                                    duration: 2,
-                                    closable: true
-                                });
-                            }
-                        }).catch(() => {
-                        });
-                    } else {
-                        this.savePassLoading = false;
-                    }
-                });
-            },
-            cancelAction (formName) {
-                this.cancelReset(formName);
-            },
-            cancelReset (formName) {
-                if (this.$refs[formName]) {
-                    this.$refs[formName].resetFields();
-                } else {
-                    this.$refs['sceneform'].resetFields();
-                }
-                this.sceneform.merchant = '';
-                this.sceneform.payScene = [];
-                this.dialogShow = false;
-                this.savePassLoading = false;
-                this.paySceneItems = [];
-                this.selectFilterable_dialog = false;
-            },
-
-            merchantFilterableHandle() {
-                this.selectFilterable = true;
-            },
-            merchantFilterableHandle_dialog() {
-                this.selectFilterable_dialog = true;
-            }
         }
     };
 </script>

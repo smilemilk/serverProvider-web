@@ -33,6 +33,9 @@ code, kbd, pre, samp {
 .margin-left-10{
     margin-left: 10px;
 }
+.margin-left-15{
+    margin-left: 15px;
+}
 .margin-bottom-0{
     margin-bottom: 0px !important;
 }
@@ -116,4 +119,39 @@ code, kbd, pre, samp {
 }
 .right {
     text-align: right;
+}
+
+//  定义结构元素 flex
+// flex
+.flex {
+    &-content {
+        display: flex;
+        &-center {
+            align-items: center;
+        }
+        &-top {
+            align-items: flex-start;
+        }
+        &-justify {
+            justify-content: center;
+        }
+        &-spaceBetween {
+            justify-content: space-between;
+        }
+        &-end {
+            justify-content: flex-end;
+        }
+    }
+    &-left {
+        flex: 1;
+        min-width: 0;
+    }
+    &-right {
+        flex-shrink: 0;
+        padding-left: 10px;
+        text-align: right;
+    }
+    &-auto {
+        flex-flow: row
+    }
 }

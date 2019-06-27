@@ -48,7 +48,6 @@
         </wm-card>
 
         <Modal
-                width="70%"
                 class="sceneOpera"
                 v-model="dialogShow"
                 :mask-closable=false

@@ -5,16 +5,16 @@ export default function () {
         columnsTable: [
             {
                 key: 'merchantName',
-                title: '商户名称',
+                title: '序号',
                 align: 'center',
-                minWidth: 100,
+                minWidth: 30,
                 render: (h, params) => {
-                    return h('div', params.row.merchantName || '');
+                    return h('div', (params.index*1+1)*(this.queryParams.page));
                 }
             },
             {
                 key: 'payeeId',
-                title: '商户编号',
+                title: '商户业务类型',
                 align: 'center',
                 minWidth: 60,
                 render: (h, params) => {
@@ -23,9 +23,27 @@ export default function () {
             },
             {
                 key: 'sceneName',
-                title: '支付场景',
+                title: '商户业务类型编码',
                 align: 'center',
-                minWidth: 120,
+                minWidth: 100,
+                render: (h, params) => {
+                    return h('div', params.row.sceneName || '');
+                }
+            },
+            {
+                key: 'sceneName',
+                title: '系统业务类型',
+                align: 'center',
+                minWidth: 100,
+                render: (h, params) => {
+                    return h('div', params.row.sceneName || '');
+                }
+            },
+            {
+                key: '状态',
+                title: '商户业务类型编码',
+                align: 'center',
+                minWidth: 100,
                 render: (h, params) => {
                     return h('div', params.row.sceneName || '');
                 }
