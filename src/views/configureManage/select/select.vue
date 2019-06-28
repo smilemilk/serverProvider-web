@@ -95,6 +95,7 @@
         width: 226px;
         height: 352px;
         padding: 3px;
+        overflow: hidden;
         .empty {
             margin-top: 30vh;
             text-align: center;

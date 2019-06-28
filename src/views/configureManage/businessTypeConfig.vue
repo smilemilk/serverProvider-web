@@ -79,6 +79,7 @@
             return Object.assign({}, storeData.call(this), {
                 queryMerchant: {
                     merchantName: '',
+                    merchantId: ''
                 },
                 merchantList: [],
                 merchantInit: true,
@@ -91,12 +92,7 @@
                     page: 1,
                     limit: 10
                 },
-                // payScene: '',
-                // paySceneList: [],
                 dataList: [],
-
-                // selectFilterable: false,
-                // selectFilterable_dialog: false,
             });
         },
         created () {
@@ -121,6 +117,7 @@
 
                     this.$refs.select.getSelectList();
                     if (results[0].value.length) {
+                        this.queryMerchant.merchantId = results[0]['value'][0]['merchantId'];
                         this.merchantCurrentHandle(results[0]['value'][0]);
                         this.queryParams.merchantId = results[0]['value'][0]['merchantId'];
                         this.getList();
@@ -156,6 +153,8 @@
             },
             merchantHandle() {
                 this.merchantInit = false;
+                this.queryMerchant.merchantId = '';
+
                 Promise.all([this.getMerchantList()]).then((results) => {
                     if (results && results[0] && results[0].status) {
                         this.$refs.select.getSelectList();
@@ -168,6 +167,7 @@
             },
             merchantCurrentHandle (item) {
                 this.queryMerchant.merchantName = item.merchantName;
+                this.queryMerchant.merchantId = item.merchantId;
 
                 this.queryParams.merchantId = item.merchantId;
                 if (this.queryParams.page !== 1) {
@@ -180,6 +180,7 @@
                 this.getList();
             },
             getList () {
+                if (this.queryMerchant.merchantId === this.queryParams.merchantId)
                 ajax.merchantListLimit(this.queryParams).then(response => {
                     if (response.success === true) {
                         this.loading = false;
@@ -209,12 +210,6 @@
             getListAction () {
                 this.handleCurrentPageChange(1);
             },
-            // handleRowChange (selection, row) {
-            //     this.multipleSelection = selection;
-            // },
-            // handleSelectAll (status) {
-            //     this.$refs.table.selectAll(status);
-            // },
             handleCurrentPageChange (val) {
                 this.queryParams.page = val;
                 this.getList();
@@ -224,14 +219,14 @@
                 this.getList();
             },
             rowAction (row) {
-                // this.merchantform.merchantId = row.payeeId;
-                // this.merchantform.merchantName = row.sceneName.split(',');
-                // this.merchantList = [{merchantId: row.payeeId, merchantRealName: row.merchantName}];
-                // this.detailAction('check');
                 this.$refs.merchantModal.show('edit', row);
             },
             addAction () {
-                this.$refs.merchantModal.show('add');
+                if (this.queryMerchant.merchantId === this.queryParams.merchantId) {
+                    this.$refs.merchantModal.show('add');
+                } else {
+
+                }
             },
         }
     };
