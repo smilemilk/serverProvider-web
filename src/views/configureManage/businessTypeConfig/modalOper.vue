@@ -38,6 +38,7 @@
                                       @on-change="currentHandle"
                                       :edit-status="editStatus&&!editOperStatus"
                                       :edit-init="editInit['rank01']"
+                                      ref="selectRank01"
                         >
                         </modal-select>
                         <modal-select :list="systemBisDetails[bisType.rank01]"
@@ -46,6 +47,7 @@
                                       @on-change="currentHandle"
                                       :edit-status="editStatus&&!editOperStatus"
                                       :edit-init="editInit['rank02']"
+                                      ref="selectRank02"
                         >
                         </modal-select>
                     </div>
@@ -118,6 +120,7 @@
 
                 editStatus: undefined,
                 editOperStatus: false,
+                editInitItem: {},
                 editInit: {
                     'rank01': '',
                     'rank02': '',
@@ -149,6 +152,9 @@
             editOperStatus: function (val) {
                 if (val === true) {
                     this.dialogSubmitText = '保存';
+
+                    this.$refs.selectRank01.init();
+                    this.$refs.selectRank02.init();
                 }
             }
         },
@@ -291,10 +297,13 @@
 
                 if (this.editStatus) {
                     this.editOperStatus = false;
+                    this.editInitItem={};
                 }
             },
 
             modalEditInit (row) {
+
+                this.editInitItem = row;
                 this.merchantform.merchantId = row.merchantBizTypeCode || '';
                 this.merchantform.merchantName = row.merchantBizTypeName || '';
 

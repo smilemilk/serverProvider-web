@@ -49,7 +49,6 @@
         computed: {
             listFormat: {
                 get: function () {
-
                     if (!this.editStatus) {
                         if (this.list)
                             this.list.forEach((it, key) => {
@@ -71,14 +70,10 @@
 
                     if (this.editStatus) {
 
-                        console.log(this.list)
-
                         if (this.list && this.list.length)
                             this.list.forEach((it, key) => {
-
                                 if ( !this.rank02) {
                                     if (it.index === this.editInit) {
-                                        console.log(this.editInit)
                                         this.$set(it, 'active', true);
                                     } else {
                                         this.$set(it, 'active', false);
@@ -87,7 +82,6 @@
 
                                 if ( this.rank02) {
                                     if (it.sysBizTypeName === this.editInit) {
-                                        console.log(this.editInit)
                                         this.$set(it, 'active', true);
                                     } else {
                                         this.$set(it, 'active', false);
@@ -123,6 +117,13 @@
         mounted () {
 
         },
+        watch: {
+            editInit(val) {
+                console.log('222')
+                this.init();
+                return val;
+            }
+        },
         methods: {
             merchantHandle (item) {
                 if (this.disabled) {
@@ -156,6 +157,30 @@
                     rank: this.rank02 ? 2 : 1,
                     value: item
                 });
+            },
+            init() {
+                console.log('laile')
+                if (this.list && this.list.length)
+                    this.list.forEach((it, key) => {
+                        if ( !this.rank02) {
+                            if (it.index === this.editInit) {
+                                this.$set(it, 'active', true);
+                            } else {
+                                this.$set(it, 'active', false);
+                            }
+                        }
+
+                        if ( this.rank02) {
+                            if (it.sysBizTypeName === this.editInit) {
+                                this.$set(it, 'active', true);
+                            } else {
+                                this.$set(it, 'active', false);
+                            }
+                        }
+
+                        return it;
+                    });
+                return this.list;
             }
         }
     };
