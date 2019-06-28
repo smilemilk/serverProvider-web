@@ -18,7 +18,7 @@
                           required
                 >
                     <Input style="width:166px;"
-                           :disabled="editStatus"
+                           :disabled="editStatus&&!editOperStatus"
                            v-model="merchantform.merchantId" placeholder="请输入商户业务类型编码"/>
                 </FormItem>
                 <FormItem label="商户业务类型名称:"
@@ -26,7 +26,7 @@
                           required
                 >
                     <Input style="width:166px;"
-                           :disabled="editStatus"
+                           :disabled="editStatus&&!editOperStatus"
                            v-model="merchantform.merchantName" placeholder="请输入商户业务类型名称"/>
                 </FormItem>
                 <FormItem label="系统业务类型:"
@@ -36,7 +36,7 @@
                         <modal-select :list="systemBisList"
                                       class="margin-right-15"
                                       @on-change="currentHandle"
-                                      :edit-status="editStatus"
+                                      :edit-status="editStatus&&!editOperStatus"
                                       :edit-init="editInit['rank01']"
                         >
                         </modal-select>
@@ -44,7 +44,7 @@
                                       rank02
                                       v-if="!editStatus ? bisType.rank01 &&systemBisDetails[bisType.rank01]  : bisType.rank01 && editInit.rank02&&systemBisDetails[bisType.rank01]"
                                       @on-change="currentHandle"
-                                      :edit-status="editStatus"
+                                      :edit-status="editStatus&&!editOperStatus"
                                       :edit-init="editInit['rank02']"
                         >
                         </modal-select>
@@ -54,7 +54,7 @@
             </Form>
             <div slot="footer">
                 <Button type="text"
-                        @click="cancelReset('merchantform')"
+                        @click="modalReset('merchantform')"
                 >{{dialogCancelText}}
                 </Button>
                 <Button type="primary"
@@ -71,6 +71,7 @@
 <script>
     import ajax from '@/api/configureManage';
     import ModalSelect from './select';
+    import {validaNumberCase, validaCommon} from '@/libs/validate';
 
     export default {
         name: 'ModalOper',
@@ -79,6 +80,28 @@
         },
         props: ['id'],
         data () {
+            const validaNumberCaseRule = (rule, value, callback) => {
+                if (value) {
+                    if (validaNumberCase(value)) {
+                        callback();
+                    } else {
+                        return callback(new Error('商户业务类型编码只能为字母，数字'));
+                    }
+                } else {
+                    callback();
+                }
+            };
+            const validaCommonRule = (rule, value, callback) => {
+                if (value) {
+                    if (validaCommon(value)) {
+                        callback();
+                    } else {
+                        return callback(new Error('商户业务类型名称只能为汉字，字母，数字'));
+                    }
+                } else {
+                    callback();
+                }
+            };
             return {
                 dialogShow: false,
                 dialogButtonText: '',
@@ -94,6 +117,7 @@
                 },
 
                 editStatus: undefined,
+                editOperStatus: false,
                 editInit: {
                     'rank01': '',
                     'rank02': '',
@@ -102,10 +126,14 @@
                 submitLoading: false,
                 merchantValidate: {
                     merchantId: [
-                        {required: true, message: '请输入商户业务类型编码', trigger: 'blur'}
+                        {required: true, message: '请输入商户业务类型编码', trigger: 'blur'},
+                        {validator: validaNumberCaseRule, trigger: 'blur'},
+                        {validator: validaNumberCaseRule, trigger: 'change'},
                     ],
                     merchantName: [
-                        {required: true, message: '请输入商户业务类型名称', trigger: 'blur'}
+                        {required: true, message: '请输入商户业务类型名称', trigger: 'blur'},
+                        {validator: validaCommonRule, trigger: 'blur'},
+                        {validator: validaCommonRule, trigger: 'change'},
                     ],
                 },
                 dialogCancelText: '取消',
@@ -116,6 +144,13 @@
         },
         mounted () {
 
+        },
+        watch: {
+            editOperStatus: function (val) {
+                if (val === true) {
+                    this.dialogSubmitText = '保存';
+                }
+            }
         },
         methods: {
             show (status, row) {
@@ -190,34 +225,51 @@
                 }
             },
             saveAction (formName) {
-                this.submitLoading = true;
-                this.$refs['merchantform'].validate((valid) => {
-                    if (valid === true) {
-                        ajax.addMerchant(
-                            {
-                                'merchantBizTypeCode': this.merchantform.merchantId+'',
-                                'merchantBizTypeName': this.merchantform.merchantName+'',
-                                'merchantId': this.id+'',
-                                'sysBizTypeId': this.bisType.rank02_id+''
-                            }
-                        ).then(response => {
-                            if (response.success === true) {
-                              this.modalReset();
 
-                              this.$emit('on-success');
-                            } else {
+                if (!this.editStatus) {
+                    this.$refs['merchantform'].validate((valid) => {
+                        if (valid === true) {
+
+                            if (!this.bisType.rank02_id) {
                                 this.$Message.error({
-                                    content: response.msg ? response.msg : '支付场景配置请求未成功',
+                                    content: '请选择系统业务类型',
                                     duration: 2,
                                     closable: true
                                 });
+                                return;
                             }
-                        }).catch(() => {
-                        });
-                    } else {
-                        this.submitLoading = false;
+
+                            this.submitLoading = true;
+                            ajax.addMerchant(
+                                {
+                                    'merchantBizTypeCode': this.merchantform.merchantId + '',
+                                    'merchantBizTypeName': this.merchantform.merchantName + '',
+                                    'merchantId': this.id + '',
+                                    'sysBizTypeId': this.bisType.rank02_id + ''
+                                }
+                            ).then(response => {
+                                if (response.success === true) {
+                                    this.modalReset();
+
+                                    this.$emit('on-success');
+                                } else {
+                                    this.$Message.error({
+                                        content: response.msg ? response.msg : '支付场景配置请求未成功',
+                                        duration: 2,
+                                        closable: true
+                                    });
+                                }
+                            }).catch(() => {
+                            });
+                        } else {
+                            this.submitLoading = false;
+                        }
+                    });
+                } else {
+                    if (this.dialogSubmitText === '修改') {
+                        this.editOperStatus = true;
                     }
-                });
+                }
             },
             cancelAction (formName) {
                 this.modalReset(formName);
@@ -236,6 +288,10 @@
                 this.bisType.rank01 = '';
                 this.bisType.rank02_id = '';
                 this.bisType.rank02 = '';
+
+                if (this.editStatus) {
+                    this.editOperStatus = false;
+                }
             },
 
             modalEditInit (row) {

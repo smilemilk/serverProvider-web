@@ -40,6 +40,18 @@ export function validaInt(str) {
     return reg.test(str);
 }
 
+// 字母，数字
+export function validaNumberCase(str) {
+    const reg = /^[0-9a-zA-Z]*$/g;
+    return reg.test(str);
+}
+
+// 汉字，字母，数字
+export function validaCommon(str) {
+    const reg = /^[A-Za-z0-9\u4e00-\u9fa5]+$/;
+    return reg.test(str);
+}
+
 export function validaPlus(str) {
     const reg=/^[+]{0,1}(\d+)$|^[+]{0,1}(\d+\.\d+)$/;
     return reg.test(str);
