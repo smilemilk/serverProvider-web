@@ -105,6 +105,14 @@ export const appRouter = [
                 icon: 'clipboard',
                 hide: false,
                 component: () => import('@/views/configureManage/businessTypeConfig.vue'),
+            },
+            {
+                path: 'payModeConfig',
+                title: '支付方式配置',
+                name: 'payModeConfig',
+                icon: 'clipboard',
+                hide: false,
+                component: () => import('@/views/configureManage/payModeConfig.vue'),
             }
         ]
     }

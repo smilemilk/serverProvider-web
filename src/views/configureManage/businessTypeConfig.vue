@@ -225,7 +225,11 @@
                 if (this.queryMerchant.merchantId === this.queryParams.merchantId) {
                     this.$refs.merchantModal.show('add');
                 } else {
-
+                    this.$Message.info({
+                        content: '请先选择机构',
+                        duration: 2,
+                        closable: true
+                    });
                 }
             },
         }

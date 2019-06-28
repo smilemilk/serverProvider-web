@@ -93,7 +93,6 @@
                     rank02: ''
                 },
 
-                // paySceneItems: [],
                 editStatus: undefined,
                 editInit: {
                     'rank01': '',
@@ -124,6 +123,7 @@
                     this.editStatus = false;
                 }
                 if (status === 'edit') {
+                    this.dialogSubmitText = '修改';
                     this.editStatus = true;
                 }
 
@@ -150,9 +150,6 @@
                             });
 
                             this.systemBisDetails = dataFormat;
-                            // console.log(this.systemBisDetails)
-                            // console.log(this.bisType.rank01)
-                            // console.log(this.systemBisDetails[this.bisType.rank01])
 
                         } else {
                             this.systemBisList = [];
@@ -192,15 +189,10 @@
                     }
                 }
             },
-            sceneHandle (item) {
-
-            },
             saveAction (formName) {
-                console.log('iiiii');
                 this.submitLoading = true;
                 this.$refs['merchantform'].validate((valid) => {
                     if (valid === true) {
-                        console.log('0000');
                         ajax.addMerchant(
                             {
                                 'merchantBizTypeCode': this.merchantform.merchantId+'',
@@ -247,7 +239,6 @@
             },
 
             modalEditInit (row) {
-                // console.log(row)
                 this.merchantform.merchantId = row.merchantBizTypeCode || '';
                 this.merchantform.merchantName = row.merchantBizTypeName || '';
 

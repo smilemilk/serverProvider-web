@@ -8,39 +8,54 @@
                     <Form ref="queryMerchant" :model="queryMerchant" inline :label-width="60" label-position="left">
                         <FormItem label="选择机构:">
                             <Input style="width:166px"
-                                   v-model="queryMerchant.merchantName" placeholder="请输入机构"/>
+                                   v-model="queryMerchant.merchantName"
+                                   @on-change="merchantHandle"
+                                   placeholder="请输入机构"/>
                         </FormItem>
                     </Form>
 
                     <merchant-select
+                            ref="select"
                             :merchant-list="merchantList"
                             @on-change="merchantCurrentHandle"
+                            :init="merchantInit"
                     >
                     </merchant-select>
                 </div>
 
                 <div>
-                    <Button type="primary" @click="addAction()" class="margin-bottom-10">添加商户业务类型
-                    </Button>
+                    <Tabs
+                            value="result"
+                            @on-click="tabHandle"
+                    >
+                        <TabPane label="对账结果" name="result">
+                            <Button type="primary" @click="addAction()" class="margin-bottom-10">添加商户业务类型
+                            </Button>
 
-                    <div class="margin-bottom-5 margin-top-5">已添加列表</div>
-                    <Table
-                            ref="table"
-                            :loading="loading"
-                            :columns="columnsTable"
-                            :data="dataList"
-                            :height="tableHeight"
-                            highlight-row
-                            border
-                    ></Table>
-                    <Page :total="total"
-                          size="small"
-                          show-total
-                          show-elevator
-                          show-sizer
-                          :current="this.queryParams.page"
-                          @on-change="handleCurrentPageChange"
-                          @on-page-size-change="handlePageSizeChange"></Page>
+                            <div class="margin-bottom-5 margin-top-5">已添加列表</div>
+                            <Table
+                                    ref="table"
+                                    :loading="loading"
+                                    :columns="columnsTable"
+                                    :data="dataList"
+                                    :height="tableHeight"
+                                    highlight-row
+                                    border
+                            ></Table>
+                            <Page :total="total"
+                                  size="small"
+                                  show-total
+                                  show-elevator
+                                  show-sizer
+                                  :current="this.queryParams.page"
+                                  @on-change="handleCurrentPageChange"
+                                  @on-page-size-change="handlePageSizeChange"></Page>
+                        </TabPane>
+                        <TabPane label="原始账单数据源" name="source" style="position: relative;">
+
+                        </TabPane>
+                    </Tabs>
+
                 </div>
 
             </div>
@@ -48,6 +63,8 @@
 
         <modal-oper
                 ref="merchantModal"
+                :id="queryParams.merchantId"
+                @on-success="getListAction"
         >
         </modal-oper>
 
@@ -63,7 +80,7 @@
     import ModalOper from './businessTypeConfig/modalOper';
 
     export default {
-        name: 'businessTypeConfig',
+        name: 'payModeConfig',
         components: {
             WmCard,
             MerchantSelect,
@@ -72,9 +89,11 @@
         data () {
             return Object.assign({}, storeData.call(this), {
                 queryMerchant: {
-                    merchantName: ''
+                    merchantName: '',
+                    merchantId: ''
                 },
                 merchantList: [],
+                merchantInit: true,
 
                 total: 0,
                 loading: true,
@@ -84,12 +103,7 @@
                     page: 1,
                     limit: 10
                 },
-                // payScene: '',
-                // paySceneList: [],
                 dataList: [],
-
-                // selectFilterable: false,
-                // selectFilterable_dialog: false,
             });
         },
         created () {
@@ -109,100 +123,104 @@
             }
             this.tableHeight = maxHeight;
 
-            Promise.all([this.getMerchantList()]).then((results)=>{
-                if (results&&results[0]&&results[0][0])
-                this.merchantCurrentHandle(results[0][0]);
-                this.queryParams.merchantId = results[0][0]['merchantId'];
-                this.getList();
+            Promise.all([this.getMerchantList()]).then((results) => {
+                if (results && results[0] && results[0].status) {
+
+                    this.$refs.select.getSelectList();
+                    if (results[0].value.length) {
+                        this.queryMerchant.merchantId = results[0]['value'][0]['merchantId'];
+                        this.merchantCurrentHandle(results[0]['value'][0]);
+                        this.queryParams.merchantId = results[0]['value'][0]['merchantId'];
+                        this.getList();
+                    } else {
+                        this.merchantList = [];
+                    }
+                }
             });
+        },
+        watch: {
+
         },
         methods: {
             getMerchantList () {
-                return new Promise((resolve, reject)=>{
-                    ajax.merchants({}).then(response => {
+                return new Promise((resolve, reject) => {
+                    ajax.merchants({
+                        merchantName: this.queryMerchant.merchantName
+                    }).then(response => {
                         if (response.success == true) {
                             this.merchantList = response.data.items;
                         } else {
                             this.merchantList = [];
                         }
-                        return resolve(response.data.items || []);
+                        return resolve({
+                            status: true,
+                            value: response.data.items || []
+                        });
                     }).catch(() => {
                         return reject({});
                     });
-                }).catch(()=>{
+                }).catch(() => {
                 });
             },
-            merchantCurrentHandle(item) {
+            merchantHandle() {
+                this.merchantInit = false;
+                this.queryMerchant.merchantId = '';
+
+                Promise.all([this.getMerchantList()]).then((results) => {
+                    if (results && results[0] && results[0].status) {
+                        this.$refs.select.getSelectList();
+                        if (results[0].value.length) {
+                        } else {
+                            this.merchantList = [];
+                        }
+                    }
+                });
+            },
+            merchantCurrentHandle (item) {
                 this.queryMerchant.merchantName = item.merchantName;
+                this.queryMerchant.merchantId = item.merchantId;
 
                 this.queryParams.merchantId = item.merchantId;
                 if (this.queryParams.page !== 1) {
                     this.queryParams = {
                         ...this.queryParams,
                         page: 1
-                    }
+                    };
                 }
 
                 this.getList();
             },
-
-            // getPayScene () {
-            //     ajax.paySceneList({}).then(response => {
-            //         if (response.success == true) {
-            //             if (response.data) {
-            //                 this.paySceneList = [{
-            //                     'merchantId': 'all',
-            //                     'merchantRealName': '全部'
-            //                 }].concat(response.data.list);
-            //             }
-            //         } else {
-            //             this.paySceneList = [];
-            //             this.$Message.error({
-            //                 content: response.msg ? response.msg : '获取商户名称失败',
-            //                 duration: 2,
-            //                 closable: true
-            //             });
-            //         }
-            //     }).catch(() => {
-            //         this.paySceneList = [];
-            //     });
-            // },
             getList () {
-                ajax.merchantListLimit(this.queryParams).then(response => {
-                    if (response.success === true) {
-                        this.loading = false;
-                        if (response.data.items) {
-                            this.dataList = response.data.items;
-                            this.total = response.data.totalCount;
+                if (this.queryMerchant.merchantId === this.queryParams.merchantId)
+                    ajax.merchantListLimit(this.queryParams).then(response => {
+                        if (response.success === true) {
+                            this.loading = false;
+                            if (response.data.items) {
+                                this.dataList = response.data.items;
+                                this.total = response.data.totalCount;
+                            } else {
+                                this.dataList = [];
+                                this.total = 0;
+                                this.queryParams.page = 1;
+                            }
                         } else {
                             this.dataList = [];
                             this.total = 0;
                             this.queryParams.page = 1;
+                            this.loading = false;
+                            this.$Message.error({
+                                content: response.msg ? response.msg : '业务类型管理请求未成功',
+                                duration: 2,
+                                closable: true
+                            });
                         }
-                    } else {
-                        this.dataList = [];
-                        this.total = 0;
-                        this.queryParams.page = 1;
+                    }).catch(() => {
                         this.loading = false;
-                        this.$Message.error({
-                            content: response.msg ? response.msg : '业务类型管理请求未成功',
-                            duration: 2,
-                            closable: true
-                        });
-                    }
-                }).catch(() => {
-                    this.loading = false;
-                });
+                    });
             },
             getListAction () {
                 this.handleCurrentPageChange(1);
             },
-            // handleRowChange (selection, row) {
-            //     this.multipleSelection = selection;
-            // },
-            // handleSelectAll (status) {
-            //     this.$refs.table.selectAll(status);
-            // },
             handleCurrentPageChange (val) {
                 this.queryParams.page = val;
                 this.getList();
@@ -212,15 +230,22 @@
                 this.getList();
             },
             rowAction (row) {
-                // this.merchantform.merchantId = row.payeeId;
-                // this.merchantform.merchantName = row.sceneName.split(',');
-                // this.merchantList = [{merchantId: row.payeeId, merchantRealName: row.merchantName}];
-                // this.detailAction('check');
                 this.$refs.merchantModal.show('edit', row);
             },
             addAction () {
-                this.$refs.merchantModal.show('add');
+                if (this.queryMerchant.merchantId === this.queryParams.merchantId) {
+                    this.$refs.merchantModal.show('add');
+                } else {
+                    this.$Message.info({
+                        content: '请先选择机构',
+                        duration: 2,
+                        closable: true
+                    });
+                }
             },
+            tabHandle() {
+
+            }
         }
     };
 </script>
