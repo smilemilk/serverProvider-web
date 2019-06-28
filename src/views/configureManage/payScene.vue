@@ -35,7 +35,6 @@
                     :height="tableHeight"
                     highlight-row
                     border
-                    @on-selection-change="handleRowChange"
             ></Table>
             <Page :total="total"
                   size="small"
@@ -83,22 +82,25 @@
                     </Select>
                 </FormItem>
 
-                <CheckboxGroup
-                        v-model="sceneform.payScene"
-                        class="sceneBox"
-                        @on-change="sceneHandle"
-                >
-                    <div
-                            v-for="item in paySceneItems"
-                            class="margin-top-8"
+                <div class="sceneBox-wrapper">
+                    <CheckboxGroup
+                            v-model="sceneform.payScene"
+                            class="sceneBox"
+                            @on-change="sceneHandle"
                     >
-                        <Checkbox
-                                v-if="item.sceneName && item.paySceneId"
-                                :label="item.sceneName">
-                            {{item.sceneName}}
-                        </Checkbox>
-                    </div>
-                </CheckboxGroup>
+                        <div
+                                v-for="item in paySceneItems"
+                                class="margin-top-8"
+                        >
+                            <Checkbox
+                                    v-if="item.sceneName && item.paySceneId"
+                                    :label="item.sceneName">
+                                {{item.sceneName}}
+                            </Checkbox>
+                        </div>
+                    </CheckboxGroup>
+                </div>
+
             </Form>
             <div slot="footer">
                 <Button type="text"
@@ -242,12 +244,6 @@
             },
             getListAction () {
                 this.handleCurrentPageChange(1);
-            },
-            handleRowChange (selection, row) {
-                this.multipleSelection = selection;
-            },
-            handleSelectAll (status) {
-                this.$refs.table.selectAll(status);
             },
             handleCurrentPageChange (val) {
                 this.queryParams.page = val;
@@ -398,7 +394,14 @@
 </script>
 
 <style lang="less" scoped>
-    @import "../../styles/common";
+    @import "../../styles/themeType";
+
+    .sceneBox-wrapper {
+        margin: 0 93px 0 115px;
+        border: 1px solid @border-theme;
+        border-radius: 4px;
+        padding: 0 8px 8px;
+    }
 
     @media screen and (max-height: 767px) {
 
