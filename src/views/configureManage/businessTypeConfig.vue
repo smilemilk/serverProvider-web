@@ -8,13 +8,17 @@
                     <Form ref="queryMerchant" :model="queryMerchant" inline :label-width="60" label-position="left">
                         <FormItem label="选择机构:">
                             <Input style="width:166px"
-                                   v-model="queryMerchant.merchantName" placeholder="请输入机构"/>
+                                   v-model="queryMerchant.merchantName"
+                                   @on-change="merchantHandle"
+                                   placeholder="请输入机构"/>
                         </FormItem>
                     </Form>
 
                     <merchant-select
+                            ref="select"
                             :merchant-list="merchantList"
                             @on-change="merchantCurrentHandle"
+                            :init="merchantInit"
                     >
                     </merchant-select>
                 </div>
@@ -48,6 +52,8 @@
 
         <modal-oper
                 ref="merchantModal"
+                :id="queryParams.merchantId"
+                @on-success="getListAction"
         >
         </modal-oper>
 
@@ -72,9 +78,10 @@
         data () {
             return Object.assign({}, storeData.call(this), {
                 queryMerchant: {
-                    merchantName: ''
+                    merchantName: '',
                 },
                 merchantList: [],
+                merchantInit: true,
 
                 total: 0,
                 loading: true,
@@ -109,30 +116,57 @@
             }
             this.tableHeight = maxHeight;
 
-            Promise.all([this.getMerchantList()]).then((results)=>{
-                if (results&&results[0]&&results[0][0])
-                this.merchantCurrentHandle(results[0][0]);
-                this.queryParams.merchantId = results[0][0]['merchantId'];
-                this.getList();
+            Promise.all([this.getMerchantList()]).then((results) => {
+                if (results && results[0] && results[0].status) {
+
+                    this.$refs.select.getSelectList();
+                    if (results[0].value.length) {
+                        this.merchantCurrentHandle(results[0]['value'][0]);
+                        this.queryParams.merchantId = results[0]['value'][0]['merchantId'];
+                        this.getList();
+                    } else {
+                        this.merchantList = [];
+                    }
+                }
             });
+        },
+        watch: {
+
         },
         methods: {
             getMerchantList () {
-                return new Promise((resolve, reject)=>{
-                    ajax.merchants({}).then(response => {
+                return new Promise((resolve, reject) => {
+                    ajax.merchants({
+                        merchantName: this.queryMerchant.merchantName
+                    }).then(response => {
                         if (response.success == true) {
                             this.merchantList = response.data.items;
                         } else {
                             this.merchantList = [];
                         }
-                        return resolve(response.data.items || []);
+                        return resolve({
+                            status: true,
+                            value: response.data.items || []
+                        });
                     }).catch(() => {
                         return reject({});
                     });
-                }).catch(()=>{
+                }).catch(() => {
                 });
             },
-            merchantCurrentHandle(item) {
+            merchantHandle() {
+                this.merchantInit = false;
+                Promise.all([this.getMerchantList()]).then((results) => {
+                    if (results && results[0] && results[0].status) {
+                        this.$refs.select.getSelectList();
+                        if (results[0].value.length) {
+                        } else {
+                            this.merchantList = [];
+                        }
+                    }
+                });
+            },
+            merchantCurrentHandle (item) {
                 this.queryMerchant.merchantName = item.merchantName;
 
                 this.queryParams.merchantId = item.merchantId;
@@ -140,33 +174,11 @@
                     this.queryParams = {
                         ...this.queryParams,
                         page: 1
-                    }
+                    };
                 }
 
                 this.getList();
             },
-
-            // getPayScene () {
-            //     ajax.paySceneList({}).then(response => {
-            //         if (response.success == true) {
-            //             if (response.data) {
-            //                 this.paySceneList = [{
-            //                     'merchantId': 'all',
-            //                     'merchantRealName': '全部'
-            //                 }].concat(response.data.list);
-            //             }
-            //         } else {
-            //             this.paySceneList = [];
-            //             this.$Message.error({
-            //                 content: response.msg ? response.msg : '获取商户名称失败',
-            //                 duration: 2,
-            //                 closable: true
-            //             });
-            //         }
-            //     }).catch(() => {
-            //         this.paySceneList = [];
-            //     });
-            // },
             getList () {
                 ajax.merchantListLimit(this.queryParams).then(response => {
                     if (response.success === true) {

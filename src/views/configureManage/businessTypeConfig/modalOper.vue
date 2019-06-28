@@ -4,7 +4,7 @@
         <Modal
                 v-model="dialogShow"
                 :mask-closable=false
-                @on-cancel="cancelReset"
+                @on-cancel="modalReset"
                 :styles="{top:'50%',overflowY: 'auto',maxHeight: '94%',transform: 'translateY(-50%) !important', width: '650px'}"
         >
             <h3 slot="header">支付场景配置</h3>
@@ -30,12 +30,8 @@
                            v-model="merchantform.merchantName" placeholder="请输入商户业务类型名称"/>
                 </FormItem>
                 <FormItem label="系统业务类型:"
-                          prop="merchantType"
                           required
                 >
-                    <!--<Input style="width:166px"-->
-                    <!--v-model="merchantform.merchantName" placeholder="请输入商户业务类型名称"/>-->
-
                     <div class="flex-content flex-content-start">
                         <modal-select :list="systemBisList"
                                       class="margin-right-15"
@@ -58,7 +54,7 @@
             </Form>
             <div slot="footer">
                 <Button type="text"
-                        @click="cancelAction('merchantform')"
+                        @click="cancelReset('merchantform')"
                 >{{dialogCancelText}}
                 </Button>
                 <Button type="primary"
@@ -81,6 +77,7 @@
         components: {
             ModalSelect
         },
+        props: ['id'],
         data () {
             return {
                 dialogShow: false,
@@ -98,9 +95,10 @@
 
                 // paySceneItems: [],
                 editStatus: undefined,
-                editInit:{
+                editInit: {
                     'rank01': '',
-                    'rank02': ''
+                    'rank02': '',
+                    'rank02_id': ''
                 },
                 submitLoading: false,
                 merchantValidate: {
@@ -109,9 +107,6 @@
                     ],
                     merchantName: [
                         {required: true, message: '请输入商户业务类型名称', trigger: 'blur'}
-                    ],
-                    merchantType: [
-                        {required: true, message: '请选择系统业务类型', trigger: 'blur'}
                     ],
                 },
                 dialogCancelText: '取消',
@@ -190,9 +185,10 @@
                     } else {
 
                         if (this.editStatus) {
-                            this.editInit.rank02 = item.value.sysBizTypeName|| '';
+                            this.editInit.rank02 = item.value.sysBizTypeName || '';
                         }
                         this.bisType.rank02 = item.value.sysBizTypeName;
+                        this.bisType.rank02_id = item.value.sysBizTypeId || '';
                     }
                 }
             },
@@ -200,36 +196,26 @@
 
             },
             saveAction (formName) {
+                console.log('iiiii');
                 this.submitLoading = true;
                 this.$refs['merchantform'].validate((valid) => {
                     if (valid === true) {
-                        if (this.merchantform.payScene.length === 0) {
-                            this.$message.error('请选择支付场景');
-                            this.submitLoading = false;
-                            return;
-                        }
-                        let sceneListArr = [];
-                        this.merchantform.payScene.forEach(it => {
-                            let item = {
-                                'paySceneId': this.paySceneItems.filter(item => item.sceneName === it)[0]['paySceneId'],
-                                'sceneName': it
-                            };
-                            sceneListArr.push(item);
-                        });
-
-                        ajax.submitScene({
-                            merchantName: this.merchantform.merchantName.trim(),
-                            payeeId: this.merchantform.merchant,
-                            sceneList: sceneListArr
-                        }).then(response => {
+                        console.log('0000');
+                        ajax.addMerchant(
+                            {
+                                'merchantBizTypeCode': this.merchantform.merchantId+'',
+                                'merchantBizTypeName': this.merchantform.merchantName+'',
+                                'merchantId': this.id+'',
+                                'sysBizTypeId': this.bisType.rank02_id+''
+                            }
+                        ).then(response => {
                             if (response.success === true) {
-                                let vm = this;
-                                this.queryParams.payeeId = vm.merchantform.merchant;
-                                this.handleCurrentPageChange(1);
-                                this.cancelReset(formName);
+                              this.modalReset();
+
+                              this.$emit('on-success');
                             } else {
                                 this.$Message.error({
-                                    content: response.msg ? response.msg : '场景配置请求未成功',
+                                    content: response.msg ? response.msg : '支付场景配置请求未成功',
                                     duration: 2,
                                     closable: true
                                 });
@@ -242,19 +228,22 @@
                 });
             },
             cancelAction (formName) {
-                this.cancelReset(formName);
+                this.modalReset(formName);
             },
-            cancelReset (formName) {
+            modalReset (formName) {
+                this.dialogShow = false;
+                this.submitLoading = false;
+
                 if (this.$refs[formName]) {
                     this.$refs[formName].resetFields();
                 } else {
                     this.$refs['merchantform'].resetFields();
                 }
-                this.merchantform.merchant = '';
-                this.merchantform.payScene = [];
-                this.dialogShow = false;
-                this.submitLoading = false;
-                this.paySceneItems = [];
+                this.merchantform.merchantId = '';
+                this.merchantform.merchantName = '';
+                this.bisType.rank01 = '';
+                this.bisType.rank02_id = '';
+                this.bisType.rank02 = '';
             },
 
             modalEditInit (row) {
@@ -266,6 +255,7 @@
                 this.bisType.rank01 = row.sysBizPropertyOne || '';
 
                 this.editInit.rank02 = row.sysBizTypeName || '';
+                this.editInit.rank02_id = row.sysBizTypeId || '';
             }
         }
     };

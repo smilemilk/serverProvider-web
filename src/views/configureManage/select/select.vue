@@ -1,6 +1,6 @@
 <template>
     <div class="merchant-select-wrapper">
-        <ul v-if="list">
+        <ul v-if="list.length">
             <li v-for="
                     (item,key) in list"
                 :key="key"
@@ -22,26 +22,41 @@
             merchantList: {
                 type: Array,
                 required: true
+            },
+            init: {
+                type: Boolean,
+                required: true
             }
         },
         data () {
             return {};
         },
-        computed:{
+        computed: {
             list: {
-                get: function(){
-                    this.merchantList.forEach((it,key)=>{
-                        if (key === 0) {
-                            this.$set(it, 'active', true);
-                        } else {
-                            this.$set(it, 'active', false);
-                        }
-                        return it;
-                    });
-                    return this.merchantList;
+                get: function () {
+                    if (this.merchantList) {
+
+                        this.merchantList.forEach((it, key) => {
+                            if (this.init) {
+
+                                if (key === 0) {
+                                    this.$set(it, 'active', true);
+                                } else {
+                                    this.$set(it, 'active', false);
+                                }
+                            } else {
+                                this.$set(it, 'active', false);
+                            }
+                            return it;
+                        });
+
+                        return this.merchantList;
+                    } else {
+                        return [];
+                    }
                 },
-                set: function(newValue) {
-                  return newValue;
+                set: function (newValue) {
+                    return newValue;
                 }
             }
         },
@@ -52,9 +67,12 @@
 
         },
         methods: {
-            merchantHandle(item) {
+            getSelectList () {
+                return this.merchantList;
+            },
+            merchantHandle (item) {
                 const list = this.merchantList;
-                this.list = list.forEach(it=>{
+                this.list = list.forEach(it => {
                     if (it.merchantId === item.merchantId) {
                         this.$set(it, 'active', true);
                     } else {
@@ -96,6 +114,7 @@
             }
         }
     }
+
     @media screen and (max-height: 767px) {
 
     }
