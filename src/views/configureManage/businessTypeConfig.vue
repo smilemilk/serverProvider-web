@@ -32,7 +32,6 @@
                             :height="tableHeight"
                             highlight-row
                             border
-                            @on-selection-change="handleRowChange"
                     ></Table>
                     <Page :total="total"
                           size="small"
@@ -50,7 +49,6 @@
         <modal-oper
                 ref="merchantModal"
         >
-
         </modal-oper>
 
     </div>
@@ -86,12 +84,12 @@
                     page: 1,
                     limit: 10
                 },
-                payScene: '',
-                paySceneList: [],
+                // payScene: '',
+                // paySceneList: [],
                 dataList: [],
 
-                selectFilterable: false,
-                selectFilterable_dialog: false,
+                // selectFilterable: false,
+                // selectFilterable_dialog: false,
             });
         },
         created () {
@@ -148,27 +146,27 @@
                 this.getList();
             },
 
-            getPayScene () {
-                ajax.paySceneList({}).then(response => {
-                    if (response.success == true) {
-                        if (response.data) {
-                            this.paySceneList = [{
-                                'merchantId': 'all',
-                                'merchantRealName': '全部'
-                            }].concat(response.data.list);
-                        }
-                    } else {
-                        this.paySceneList = [];
-                        this.$Message.error({
-                            content: response.msg ? response.msg : '获取商户名称失败',
-                            duration: 2,
-                            closable: true
-                        });
-                    }
-                }).catch(() => {
-                    this.paySceneList = [];
-                });
-            },
+            // getPayScene () {
+            //     ajax.paySceneList({}).then(response => {
+            //         if (response.success == true) {
+            //             if (response.data) {
+            //                 this.paySceneList = [{
+            //                     'merchantId': 'all',
+            //                     'merchantRealName': '全部'
+            //                 }].concat(response.data.list);
+            //             }
+            //         } else {
+            //             this.paySceneList = [];
+            //             this.$Message.error({
+            //                 content: response.msg ? response.msg : '获取商户名称失败',
+            //                 duration: 2,
+            //                 closable: true
+            //             });
+            //         }
+            //     }).catch(() => {
+            //         this.paySceneList = [];
+            //     });
+            // },
             getList () {
                 ajax.merchantListLimit(this.queryParams).then(response => {
                     if (response.success === true) {
@@ -187,7 +185,7 @@
                         this.queryParams.page = 1;
                         this.loading = false;
                         this.$Message.error({
-                            content: response.msg ? response.msg : '支付配置请求未成功',
+                            content: response.msg ? response.msg : '业务类型管理请求未成功',
                             duration: 2,
                             closable: true
                         });
@@ -199,12 +197,12 @@
             getListAction () {
                 this.handleCurrentPageChange(1);
             },
-            handleRowChange (selection, row) {
-                this.multipleSelection = selection;
-            },
-            handleSelectAll (status) {
-                this.$refs.table.selectAll(status);
-            },
+            // handleRowChange (selection, row) {
+            //     this.multipleSelection = selection;
+            // },
+            // handleSelectAll (status) {
+            //     this.$refs.table.selectAll(status);
+            // },
             handleCurrentPageChange (val) {
                 this.queryParams.page = val;
                 this.getList();
@@ -214,13 +212,14 @@
                 this.getList();
             },
             rowAction (row) {
-                this.merchantform.merchantId = row.payeeId;
-                this.merchantform.merchantName = row.sceneName.split(',');
-                this.merchantList = [{merchantId: row.payeeId, merchantRealName: row.merchantName}];
-                this.detailAction('check');
+                // this.merchantform.merchantId = row.payeeId;
+                // this.merchantform.merchantName = row.sceneName.split(',');
+                // this.merchantList = [{merchantId: row.payeeId, merchantRealName: row.merchantName}];
+                // this.detailAction('check');
+                this.$refs.merchantModal.show('edit', row);
             },
-            addAction (status) {
-                this.$refs.merchantModal.show();
+            addAction () {
+                this.$refs.merchantModal.show('add');
             },
         }
     };

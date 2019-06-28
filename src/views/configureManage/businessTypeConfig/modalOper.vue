@@ -18,6 +18,7 @@
                           required
                 >
                     <Input style="width:166px;"
+                           :disabled="editStatus"
                            v-model="merchantform.merchantId" placeholder="请输入商户业务类型编码"/>
                 </FormItem>
                 <FormItem label="商户业务类型名称:"
@@ -25,6 +26,7 @@
                           required
                 >
                     <Input style="width:166px;"
+                           :disabled="editStatus"
                            v-model="merchantform.merchantName" placeholder="请输入商户业务类型名称"/>
                 </FormItem>
                 <FormItem label="系统业务类型:"
@@ -32,18 +34,22 @@
                           required
                 >
                     <!--<Input style="width:166px"-->
-                           <!--v-model="merchantform.merchantName" placeholder="请输入商户业务类型名称"/>-->
+                    <!--v-model="merchantform.merchantName" placeholder="请输入商户业务类型名称"/>-->
 
                     <div class="flex-content flex-content-start">
                         <modal-select :list="systemBisList"
                                       class="margin-right-15"
                                       @on-change="currentHandle"
+                                      :edit-status="editStatus"
+                                      :edit-init="editInit['rank01']"
                         >
                         </modal-select>
                         <modal-select :list="systemBisDetails[bisType.rank01]"
                                       rank02
-                                      v-if="bisType.rank01"
+                                      v-if="!editStatus ? bisType.rank01 &&systemBisDetails[bisType.rank01]  : bisType.rank01 && editInit.rank02&&systemBisDetails[bisType.rank01]"
                                       @on-change="currentHandle"
+                                      :edit-status="editStatus"
+                                      :edit-init="editInit['rank02']"
                         >
                         </modal-select>
                     </div>
@@ -91,6 +97,11 @@
                 },
 
                 // paySceneItems: [],
+                editStatus: undefined,
+                editInit:{
+                    'rank01': '',
+                    'rank02': ''
+                },
                 submitLoading: false,
                 merchantValidate: {
                     merchantId: [
@@ -113,31 +124,41 @@
 
         },
         methods: {
-            show () {
+            show (status, row) {
+                if (status === 'add') {
+                    this.editStatus = false;
+                }
+                if (status === 'edit') {
+                    this.editStatus = true;
+                }
+
                 this.dialogShow = true;
 
                 ajax.systemBis({}).then(response => {
                     if (response.success === true) {
                         if (response.data) {
                             const list = response.data.sysBizTypeList;
-                            this.systemBisList = list.map((it,key)=> {
+
+                            this.systemBisList = list.map((it, key) => {
                                 return {
                                     name: it.sysBizPropertyOne,
                                     index: it.sysBizPropertyOne
                                 };
                             });
-                            console.log(response.data.sysBizTypeList)
 
                             let dataFormat = {};
-                            response.data.sysBizTypeList.forEach(it=>{
-                                dataFormat={
+                            response.data.sysBizTypeList.forEach(it => {
+                                dataFormat = {
                                     ...dataFormat,
                                     [it['sysBizPropertyOne']]: it.sysBizTypeResList
-                                }
+                                };
                             });
-                            console.log(dataFormat)
 
                             this.systemBisDetails = dataFormat;
+                            // console.log(this.systemBisDetails)
+                            // console.log(this.bisType.rank01)
+                            // console.log(this.systemBisDetails[this.bisType.rank01])
+
                         } else {
                             this.systemBisList = [];
                         }
@@ -152,15 +173,26 @@
                 }).catch(() => {
                 });
 
+                if (status === 'edit') {
+                    this.modalEditInit(row);
+                }
+
             },
             currentHandle (item) {
                 if (item) {
                     if (item.rank === 1) {
+
+                        if (this.editStatus) {
+                            this.editInit.rank01 = item.value.name;
+                        }
                         this.bisType.rank01 = item.value.name;
-                        console.log(item)
+
                     } else {
+
+                        if (this.editStatus) {
+                            this.editInit.rank02 = item.value.sysBizTypeName|| '';
+                        }
                         this.bisType.rank02 = item.value.sysBizTypeName;
-                        console.log(item)
                     }
                 }
             },
@@ -225,11 +257,15 @@
                 this.paySceneItems = [];
             },
 
-            merchantFilterableHandle () {
-                this.selectFilterable = true;
-            },
-            merchantFilterableHandle_dialog () {
-                this.selectFilterable_dialog = true;
+            modalEditInit (row) {
+                // console.log(row)
+                this.merchantform.merchantId = row.merchantBizTypeCode || '';
+                this.merchantform.merchantName = row.merchantBizTypeName || '';
+
+                this.editInit.rank01 = row.sysBizPropertyOne || '';
+                this.bisType.rank01 = row.sysBizPropertyOne || '';
+
+                this.editInit.rank02 = row.sysBizTypeName || '';
             }
         }
     };
@@ -237,6 +273,7 @@
 
 <style lang="less" scoped>
     @import "../../../styles/themeType";
+
     @media screen and (max-height: 786px) {
 
     }

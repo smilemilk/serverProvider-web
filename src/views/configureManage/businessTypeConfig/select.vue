@@ -1,12 +1,15 @@
 <template>
     <div class="select-wrapper">
-        <ul v-if="listFormat">
+        <ul v-if="listFormat && list">
             <li v-for="
                     (item,key) in listFormat"
                 :key="key"
                 class="select-item"
                 @click="merchantHandle(item)"
-                :class="item.active ? 'active' : ''"
+                :class="[
+                item.active ? 'active' : '',
+                disabled ? 'disabled' : ''
+                ]"
             >
                 {{rank02 ? item.sysBizTypeName || '' : item.name || ''}}
             </li>
@@ -26,32 +29,90 @@
             rank02: {
                 type: Boolean,
                 required: false
-            }
+            },
+
+            editStatus: {
+                type: Boolean,
+                required: false
+            },
+            editInit: {
+                type: String,
+                required: false
+            },
         },
         data () {
-            return {};
+            return {
+            };
+        },
+        created() {
         },
         computed: {
             listFormat: {
                 get: function () {
-                    if (this.list)
-                    this.list.forEach((it, key) => {
-                        if (!this.rank02) {
-                            if (key === 0) {
-                                this.$set(it, 'active', true);
-                            } else {
-                                this.$set(it, 'active', false);
-                            }
-                            this.merchantHandle(this.list[0]);
-                        } else {
-                            this.$set(it, 'active', false);
 
-                        }
-                        return it;
-                    });
-                    return this.list;
+                    if (!this.editStatus) {
+                        if (this.list)
+                            this.list.forEach((it, key) => {
+                                if (!this.rank02) {
+                                    if (key === 0) {
+                                        this.$set(it, 'active', true);
+                                    } else {
+                                        this.$set(it, 'active', false);
+                                    }
+                                    this.merchantHandle(this.list[0]);
+                                } else {
+                                    this.$set(it, 'active', false);
+
+                                }
+                                return it;
+                            });
+                        return this.list;
+                    }
+
+                    if (this.editStatus) {
+
+                        console.log(this.list)
+
+                        if (this.list && this.list.length)
+                            this.list.forEach((it, key) => {
+
+                                if ( !this.rank02) {
+                                    if (it.index === this.editInit) {
+                                        console.log(this.editInit)
+                                        this.$set(it, 'active', true);
+                                    } else {
+                                        this.$set(it, 'active', false);
+                                    }
+                                }
+
+                                if ( this.rank02) {
+                                    if (it.sysBizTypeName === this.editInit) {
+                                        console.log(this.editInit)
+                                        this.$set(it, 'active', true);
+                                    } else {
+                                        this.$set(it, 'active', false);
+                                    }
+                                }
+
+                                return it;
+                            });
+                        return this.list;
+                    }
+
                 },
                 set: function (newValue) {
+                    return newValue;
+                }
+            },
+            disabled: {
+                get: function() {
+                    if (this.editStatus) {
+                        return true;
+                    } else {
+                        return false;
+                    }
+                },
+                set: function(newValue) {
                     return newValue;
                 }
             }
@@ -64,26 +125,33 @@
         },
         methods: {
             merchantHandle (item) {
+                if (this.disabled) {
+                    return false;
+                }
                 const list = this.list;
-                this.listFormat = list.forEach(it => {
 
-                    if (!this.rank02) {
-                        if (it.name === item.name) {
-                            this.$set(it, 'active', true);
-                        } else {
-                            this.$set(it, 'active', false);
-                        }
-                        return it;
-                    } else {
-                        if (it.sysBizTypeName === item.sysBizTypeName) {
-                            this.$set(it, 'active', true);
-                        } else {
-                            this.$set(it, 'active', false);
-                        }
-                        return it;
-                    }
+                if (!this.editStatus) {
+                    this.listFormat = list.forEach(it => {
 
-                });
+                        if (!this.rank02) {
+                            if (it.name === item.name) {
+                                this.$set(it, 'active', true);
+                            } else {
+                                this.$set(it, 'active', false);
+                            }
+                            return it;
+                        } else {
+                            if (it.sysBizTypeName === item.sysBizTypeName) {
+                                this.$set(it, 'active', true);
+                            } else {
+                                this.$set(it, 'active', false);
+                            }
+                            return it;
+                        }
+
+                    });
+                }
+
                 this.$emit('on-change', {
                     rank: this.rank02 ? 2 : 1,
                     value: item
@@ -117,6 +185,9 @@
                 &.active {
                     color: @main-theme-color;
                     background-color: @main-theme-blueLighter;
+                }
+                &.disabled {
+                    cursor: not-allowed;
                 }
             }
         }
