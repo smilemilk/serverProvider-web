@@ -1,6 +1,6 @@
 <template>
     <div>
-        <wm-card title="业务类型管理"
+        <wm-card title="支付方式配置"
                  class="margin-bottom-10">
 
             <div class="flex-content flex-content-start">
@@ -28,31 +28,14 @@
                             value="result"
                             @on-click="tabHandle"
                     >
-                        <TabPane label="对账结果" name="result">
-                            <Button type="primary" @click="addAction()" class="margin-bottom-10">添加商户业务类型
-                            </Button>
-
-                            <div class="margin-bottom-5 margin-top-5">已添加列表</div>
-                            <Table
-                                    ref="table"
-                                    :loading="loading"
-                                    :columns="columnsTable"
-                                    :data="dataList"
-                                    :height="tableHeight"
-                                    highlight-row
-                                    border
-                            ></Table>
-                            <Page :total="total"
-                                  size="small"
-                                  show-total
-                                  show-elevator
-                                  show-sizer
-                                  :current="this.queryParams.page"
-                                  @on-change="handleCurrentPageChange"
-                                  @on-page-size-change="handlePageSizeChange"></Page>
+                        <TabPane label="收款账户配置" name="result">
+                            <pay-account
+                                    ref="payAccount"
+                                    :query-params-primary="queryParams"
+                                    :query-merchant-primary="queryMerchant"
+                            ></pay-account>
                         </TabPane>
-                        <TabPane label="原始账单数据源" name="source" style="position: relative;">
-
+                        <TabPane label="支付方式配置" name="source" style="position: relative;">
                         </TabPane>
                     </Tabs>
 
@@ -60,14 +43,6 @@
 
             </div>
         </wm-card>
-
-        <modal-oper
-                ref="merchantModal"
-                :id="queryParams.merchantId"
-                @on-success="getListAction"
-        >
-        </modal-oper>
-
     </div>
 </template>
 
@@ -77,14 +52,14 @@
     import {parseTime} from '@/filters';
     import ajax from '@/api/configureManage';
     import MerchantSelect from './select/select';
-    import ModalOper from './businessTypeConfig/modalOper';
+    import payAccount from './payModeConfig/payAccount';
 
     export default {
         name: 'payModeConfig',
         components: {
             WmCard,
             MerchantSelect,
-            ModalOper
+            payAccount
         },
         data () {
             return Object.assign({}, storeData.call(this), {
@@ -94,35 +69,16 @@
                 },
                 merchantList: [],
                 merchantInit: true,
-
-                total: 0,
-                loading: true,
-                tableHeight: 320,
                 queryParams: {
                     merchantId: 'all',
                     page: 1,
                     limit: 10
                 },
-                dataList: [],
             });
         },
         created () {
-            this.getList();
         },
         mounted () {
-            let maxHeight = window.innerHeight - this.$refs.table.$el.offsetTop
-                - 44;
-            let tableCount;
-            if (window.screen.availHeight < 768) {
-                tableCount = 32 * 11;
-            } else {
-                tableCount = 48 * 11;
-            }
-            if (maxHeight > tableCount) {
-                maxHeight = tableCount;
-            }
-            this.tableHeight = maxHeight;
-
             Promise.all([this.getMerchantList()]).then((results) => {
                 if (results && results[0] && results[0].status) {
 
@@ -131,16 +87,15 @@
                         this.queryMerchant.merchantId = results[0]['value'][0]['merchantId'];
                         this.merchantCurrentHandle(results[0]['value'][0]);
                         this.queryParams.merchantId = results[0]['value'][0]['merchantId'];
-                        this.getList();
+                        this.$refs.payAccount.getList();
+
                     } else {
                         this.merchantList = [];
                     }
                 }
             });
         },
-        watch: {
-
-        },
+        watch: {},
         methods: {
             getMerchantList () {
                 return new Promise((resolve, reject) => {
@@ -162,7 +117,7 @@
                 }).catch(() => {
                 });
             },
-            merchantHandle() {
+            merchantHandle () {
                 this.merchantInit = false;
                 this.queryMerchant.merchantId = '';
 
@@ -188,62 +143,20 @@
                     };
                 }
 
-                this.getList();
-            },
-            getList () {
-                if (this.queryMerchant.merchantId === this.queryParams.merchantId)
-                    ajax.merchantListLimit(this.queryParams).then(response => {
-                        if (response.success === true) {
-                            this.loading = false;
-                            if (response.data.items) {
-                                this.dataList = response.data.items;
-                                this.total = response.data.totalCount;
-                            } else {
-                                this.dataList = [];
-                                this.total = 0;
-                                this.queryParams.page = 1;
-                            }
-                        } else {
-                            this.dataList = [];
-                            this.total = 0;
-                            this.queryParams.page = 1;
-                            this.loading = false;
-                            this.$Message.error({
-                                content: response.msg ? response.msg : '业务类型管理请求未成功',
-                                duration: 2,
-                                closable: true
-                            });
-                        }
-                    }).catch(() => {
-                        this.loading = false;
-                    });
-            },
-            getListAction () {
-                this.handleCurrentPageChange(1);
-            },
-            handleCurrentPageChange (val) {
-                this.queryParams.page = val;
-                this.getList();
-            },
-            handlePageSizeChange (val) {
-                this.queryParams.limit = val;
-                this.getList();
-            },
-            rowAction (row) {
-                this.$refs.merchantModal.show('edit', row);
+                this.$refs.payAccount.getList();
             },
             addAction () {
-                if (this.queryMerchant.merchantId === this.queryParams.merchantId) {
-                    this.$refs.merchantModal.show('add');
-                } else {
-                    this.$Message.info({
-                        content: '请先选择机构',
-                        duration: 2,
-                        closable: true
-                    });
-                }
+
             },
-            tabHandle() {
+            helpAction() {
+                this.$Modal.info({
+                    title: '帮助说明',
+                    content: '1、微脉代收账户为默认开通账户，无需配置账户信息，也不可修改账户信息\n' +
+                    '2、若未配置直收账户，则使用微脉代收账户收款；若某资金通道配置直收账户，则优先使用直收账户收款\n' +
+                    '3、目前一个资金通道只开放配置一个直收账户'
+                });
+            },
+            tabHandle () {
 
             }
         }
@@ -251,24 +164,8 @@
 </script>
 
 <style lang="less" scoped>
-    @import "../../styles/common";
-
-    .ivu-card {
-        margin-bottom: 10px;
-    }
-
-    .sceneOpera {
-        .sceneBox {
-            width: 306px;
-            margin-left: 50px;
-            padding: 2px 0 10px 10px;
-            border: 1px solid @border-theme;
-        }
-    }
 
     @media screen and (max-height: 786px) {
-        .operatorSection .operateItem p.operateName {
-            font-size: 12px;
-        }
+
     }
 </style>

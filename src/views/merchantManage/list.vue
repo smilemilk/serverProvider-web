@@ -1,42 +1,39 @@
 <template>
     <div>
-        <title-item text="商户管理列表" sizeType="small" class="margin-top-20"></title-item>
-        <Card class="searchBox">
-            <Form ref="queryParams" :model="queryParams" inline :label-width="60" label-position="left">
-                <FormItem label="收款类型:">
-                    <Select v-model="queryParams.dealType"
-                            style="width:100px">
-                        <Option v-for="item in dealTypeList" :value="item.id" :key="item.value">
-                            {{item.value}}
-                        </Option>
-                    </Select>
-                </FormItem>
+        <wm-card title="商户管理列表"
+                 class="margin-bottom-10">
+            <div class="flex-content flex-content-spaceBetween">
+                <Form ref="queryParams" :model="queryParams" inline :label-width="70" label-position="left">
+                    <FormItem label="收款类型:">
+                        <Select v-model="queryParams.dealType"
+                                style="width:160px">
+                            <Option v-for="item in dealTypeList" :value="item.id" :key="item.value">
+                                {{item.value}}
+                            </Option>
+                        </Select>
+                    </FormItem>
 
-                <FormItem label="申请日期:" prop="dateSearch">
-                    <DatePicker v-model="dateSearch"
-                                format="yyyy-MM-dd"
-                                type="daterange"
-                                placement="bottom-start"
-                                placeholder="选择开始日期—结束日期"
-                                style="width: 200px"
-                                :options="endTimeOptions"
-                                @on-change="dateChange"></DatePicker>
-                </FormItem>
-            </Form>
-            <div>
-                <Row>
-                    <Col span="18" :md="18" :sm="24" :xs="24">
-                        <Button type="primary" @click="getListAction()">查询</Button>
-                        <!--<Button type="primary" @click="getHangLink">查看当前挂账</Button>-->
-                        <!--<Button type="primary" @click="exportAction">导出</Button>-->
-                        <!--<Button type="primary" @click="reconciliationsOpera">开始对账</Button>-->
-                        <!--<Button type="primary" @click="downloadAction">对账结果下载</Button>-->
-                        <!--<Button @click="handleSelectAll(true)" style="display:none;">全选</Button>-->
-                    </Col>
-                </Row>
+                    <FormItem label="申请日期:" prop="dateSearch">
+                        <DatePicker v-model="dateSearch"
+                                    format="yyyy-MM-dd"
+                                    type="daterange"
+                                    placement="bottom-start"
+                                    placeholder="选择开始日期—结束日期"
+                                    style="width: 200px"
+                                    :options="endTimeOptions"
+                                    @on-change="dateChange"></DatePicker>
+                    </FormItem>
+                </Form>
+                <div>
+                    <Button type="primary" @click="getListAction()">查询</Button>
+                    <!--<Button type="primary" @click="getHangLink">查看当前挂账</Button>-->
+                    <!--<Button type="primary" @click="exportAction">导出</Button>-->
+                    <!--<Button type="primary" @click="reconciliationsOpera">开始对账</Button>-->
+                    <!--<Button type="primary" @click="downloadAction">对账结果下载</Button>-->
+                    <!--<Button @click="handleSelectAll(true)" style="display:none;">全选</Button>-->
+                </div>
             </div>
-        </Card>
-        <Card>
+
             <Table
                     ref="table"
                     :loading="loading"
@@ -55,12 +52,12 @@
                   :current="this.queryParams.page"
                   @on-change="handleCurrentPageChange"
                   @on-page-size-change="handlePageSizeChange"></Page>
-        </Card>
+        </wm-card>
     </div>
 </template>
 
 <script>
-    import TitleItem from '_c/title/index';
+    import WmCard from '_c/card/card';
     import storeData from './store/list';
     import {parseTime} from '@/filters';
     import ajax from '@/api/statistics';
@@ -70,10 +67,10 @@
     export default {
         name: 'reconciliations',
         components: {
+            WmCard,
             WarnupLoad,
-            TitleItem
         },
-        data() {
+        data () {
             return Object.assign({}, storeData.call(this), {
                 endTimeOptions: {
                     disabledDate: date => {
@@ -82,16 +79,16 @@
                 }
             });
         },
-        created() {
+        created () {
             this.queryParams.billEndTime = parseTime(new Date().getTime() - 24 * 60 * 60 * 1000, '{y}-{m}-{d}'); // 首次进来默认展示一周数据
             this.queryParams.billStartTime = parseTime(new Date().getTime() - 7 * 24 * 60 * 60 * 1000, '{y}-{m}-{d}'); // 首次进来默认展示一周数据
             this.dateSearch = [this.queryParams.billStartTime, this.queryParams.billEndTime];
             this.getSearchList();
             this.getList();
         },
-        mounted() {
+        mounted () {
             let maxHeight = window.innerHeight - this.$refs.table.$el.offsetTop
-                - document.querySelector(".main-header-con").clientHeight - document.querySelector('.searchBox').clientHeight - 44;
+                - document.querySelector('.main-header-con').clientHeight - document.querySelector('.searchBox').clientHeight - 44;
             let tableCount;
             if (window.screen.availHeight < 768) {
                 tableCount = 32 * 11;
@@ -104,7 +101,7 @@
             this.tableHeight = maxHeight;
         },
         methods: {
-            dateChange(val) {
+            dateChange (val) {
                 if (val) {
                     this.queryParams.billStartTime = parseTime(this.dateSearch[0], '{y}-{m}-{d}');
                     this.queryParams.billEndTime = parseTime(this.dateSearch[1], '{y}-{m}-{d}');
@@ -113,7 +110,7 @@
                     this.queryParams.billEndTime = '';
                 }
             },
-            getSearchList() {
+            getSearchList () {
                 ajax.checkListInfo({
                     'billEndTime': this.queryParams.billEndTime,
                     'billStartTime': this.queryParams.billStartTime,
@@ -133,7 +130,7 @@
                 }).catch(() => {
                 });
             },
-            getList() {
+            getList () {
                 ajax.checkList(this.queryParams).then(response => {
                     if (response.success === true) {
                         this.loading = false;
@@ -160,25 +157,25 @@
                     this.loading = false;
                 });
             },
-            getListAction() {
+            getListAction () {
                 this.handleCurrentPageChange(1);
                 this.getSearchList();
             },
-            handleRowChange(selection, row) {
+            handleRowChange (selection, row) {
                 this.multipleSelection = selection;
             },
-            handleSelectAll(status) {
+            handleSelectAll (status) {
                 this.$refs.table.selectAll(status);
             },
-            handlePageSizeChange(val) {
+            handlePageSizeChange (val) {
                 this.queryParams.limit = val;
                 this.getList();
             },
-            handleCurrentPageChange(val) {
+            handleCurrentPageChange (val) {
                 this.queryParams.page = val;
                 this.getList();
             },
-            search(data, argumentObj) {
+            search (data, argumentObj) {
                 let res = data;
                 let dataClone = data;
                 for (let argu in argumentObj) {

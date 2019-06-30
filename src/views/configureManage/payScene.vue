@@ -5,7 +5,7 @@
 
             <Row>
                 <Col span="18" :md="18" :sm="24" :xs="24">
-                    <Form ref="queryParams" :model="queryParams" inline :label-width="60" label-position="left">
+                    <Form ref="queryParams" :model="queryParams" inline :label-width="70" label-position="left">
                         <FormItem label="商户名称:">
                             <Select v-model="queryParams.payeeId"
                                     :filterable="selectFilterable"
@@ -93,6 +93,7 @@
                                 class="margin-top-8"
                         >
                             <Checkbox
+                                    :disabed="detailStatus && dialogButtonText==='修改'"
                                     v-if="item.sceneName && item.paySceneId"
                                     :label="item.sceneName">
                                 {{item.sceneName}}
@@ -147,7 +148,6 @@
                 selectFilterable_dialog: false,
 
                 dialogShow: false,
-                dialogButtonText: '',
                 sceneform: {
                     merchant: '',
                     merchantName: '',
@@ -162,7 +162,9 @@
                     ],
                 },
                 dialogCancelText: '取消',
-                detailStatus: false
+                dialogButtonText: '',
+                detailStatus: false,
+                disabledStatus: false
             });
         },
         created () {
@@ -192,7 +194,11 @@
                             this.paySceneList = [{
                                 'merchantId': 'all',
                                 'merchantRealName': '全部'
-                            }].concat(response.data.list);
+                            }].concat([...response.data.list.map(it=>{
+                                if (it.merchantId) {
+                                    return it;
+                                }
+                            })]);
                         }
                     } else {
                         this.paySceneList = [];
@@ -258,6 +264,7 @@
                 this.sceneform.payScene = row.sceneName.split(',');
                 this.merchantList = [{merchantId: row.payeeId, merchantRealName: row.merchantName}];
                 this.detailAction('check');
+                this.detailStatus = true;
             },
             detailAction (status) {
                 this.dialogHandle(status);
@@ -325,6 +332,11 @@
 
             },
             saveAction (formName) {
+                if (this.detailStatus === true && this.dialogButtonText === "修改") {
+                    this.dialogButtonText = "保存";
+                    return;
+                }
+
                 this.savePassLoading = true;
                 this.$refs['sceneform'].validate((valid) => {
                     if (valid === true) {
@@ -381,6 +393,8 @@
                 this.savePassLoading = false;
                 this.paySceneItems = [];
                 this.selectFilterable_dialog = false;
+
+                this.detailStatus = false;
             },
 
             merchantFilterableHandle () {

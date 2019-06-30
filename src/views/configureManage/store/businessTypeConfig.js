@@ -72,15 +72,39 @@ export default function () {
                 align: 'center',
                 width: 100,
                 render: (h, params) => {
+                    let buttonText = '';
+                    let operStatus = '';
+
+                    if (params.row.isDelete === 0 || params.row.isDelete === '0') {
+                        buttonText = '废除';
+                        operStatus = 'delete';
+                    }
+                    if (params.row.isDelete === 1 || params.row.isDelete === '1') {
+                        buttonText = '启用';
+                        operStatus = 'recover';
+                    }
                     return h('div',
-                        [h('Button', {
+                        [
+                            h('Button', {
+                                props: {
+                                    type: 'primary',
+                                    size: 'small'
+                                },
+                                class: 'margin-right-15',
+                                on: {
+                                    click: () => {
+                                        this.rowOperaAction(params.row, operStatus);
+                                    }
+                                }
+                            }, buttonText),
+                            h('Button', {
                             props: {
                                 type: 'primary',
                                 size: 'small'
                             },
                             on: {
                                 click: () => {
-                                    this.rowAction(params.row);
+                                    this.rowDetailAction(params.row);
                                 }
                             }
                         }, '详情')

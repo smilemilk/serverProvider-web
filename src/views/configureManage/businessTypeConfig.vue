@@ -218,8 +218,32 @@
                 this.queryParams.limit = val;
                 this.getList();
             },
-            rowAction (row) {
+            rowDetailAction (row) {
                 this.$refs.merchantModal.show('edit', row);
+            },
+            rowOperaAction (row, status) {
+                let msg = '';
+                if (status === 'delete') {
+                    msg = '废除';
+                }
+                if (status === 'recover') {
+                    msg = '启用';
+                }
+                this.$Modal.confirm({
+                    title:'提示' ,
+                    content: '确认' + msg + '吗?',
+                    onOk: () => {
+                        if (status === 'delete') {
+                            this.deleteAction(row);
+                        }
+                        if (status === 'recover') {
+                            msg = '启用';
+                            this.recoverAction(row);
+                        }
+                    },
+                    onCancel: () => {
+                    }
+                });
             },
             addAction () {
                 if (this.queryMerchant.merchantId === this.queryParams.merchantId) {
@@ -231,6 +255,48 @@
                         closable: true
                     });
                 }
+            },
+            deleteAction(row) {
+                ajax.deleteMerchant({
+                    merchantBizTypeId: row.merchantBizTypeId
+                }).then(response => {
+                    if (response.success === true) {
+                        this.$Message.success({
+                            content: response.msg ? response.msg : '已废除',
+                            duration: 2,
+                            closable: true
+                        });
+                        this.getListAction();
+                    } else {
+                        this.$Message.error({
+                            content: response.msg ? response.msg : '废除请求未成功',
+                            duration: 2,
+                            closable: true
+                        });
+                    }
+                }).catch(() => {
+                });
+            },
+            recoverAction(row) {
+                ajax.recoverMerchant({
+                    merchantBizTypeId: row.merchantBizTypeId
+                }).then(response => {
+                    if (response.success === true) {
+                        this.$Message.success({
+                            content: response.msg ? response.msg : '已启用',
+                            duration: 2,
+                            closable: true
+                        });
+                        this.getListAction();
+                    } else {
+                        this.$Message.error({
+                            content: response.msg ? response.msg : '启用请求未成功',
+                            duration: 2,
+                            closable: true
+                        });
+                    }
+                }).catch(() => {
+                });
             },
         }
     };

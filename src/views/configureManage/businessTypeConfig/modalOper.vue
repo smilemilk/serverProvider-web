@@ -275,6 +275,46 @@
                     if (this.dialogSubmitText === '修改') {
                         this.editOperStatus = true;
                     }
+                    if (this.dialogSubmitText === '保存') {
+                        this.$refs['merchantform'].validate((valid) => {
+                            if (valid === true) {
+
+                                if (!this.bisType.rank02_id) {
+                                    this.$Message.error({
+                                        content: '请选择系统业务类型',
+                                        duration: 2,
+                                        closable: true
+                                    });
+                                    return;
+                                }
+
+                                this.submitLoading = true;
+                                ajax.updateMerchant(
+                                    {
+                                        'merchantBizTypeCode': this.merchantform.merchantId + '',
+                                        'merchantBizTypeName': this.merchantform.merchantName + '',
+                                        'merchantId': this.id + '',
+                                        'sysBizTypeId': this.bisType.rank02_id + ''
+                                    }
+                                ).then(response => {
+                                    if (response.success === true) {
+                                        this.modalReset();
+
+                                        this.$emit('on-success');
+                                    } else {
+                                        this.$Message.error({
+                                            content: response.msg ? response.msg : '支付场景配置请求未成功',
+                                            duration: 2,
+                                            closable: true
+                                        });
+                                    }
+                                }).catch(() => {
+                                });
+                            } else {
+                                this.submitLoading = false;
+                            }
+                        });
+                    }
                 }
             },
             cancelAction (formName) {

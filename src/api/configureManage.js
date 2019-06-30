@@ -3,6 +3,7 @@
 import request from '@/libs/request'
 import util from '@/libs/util';
 
+//业务类型管理
 export function merchants (params) {
     return request({
         url: util.ajaxFront + '/merchantBizType/queryMerchants',
@@ -25,8 +26,42 @@ export function addMerchant (params) {
         data: params
     });
 }
+export function updateMerchant (params) {
+    return request({
+        url: util.ajaxFront + '/merchantBizType/updateMerchantBizType',
+        method: 'post',
+        params: params,
+        data: params
+    });
+}
+export function deleteMerchant (params) {
+    return request({
+        url: util.ajaxFront + '/merchantBizType/deleteMerchantBizType',
+        method: 'post',
+        params: params,
+        data: params
+    });
+}
+export function recoverMerchant (params) {
+    return request({
+        url: util.ajaxFront + '/merchantBizType/recoverMerchantBizType',
+        method: 'post',
+        params: params,
+        data: params
+    });
+}
 
+//业务类型管理
+export function accountList (params) {
+    return request({
+        url: util.ajaxFront + '/thirdpay/account/list',
+        method: 'post',
+        params: params,
+        data: params
+    });
+}
 
+//支付场景配置
 export function systemBis (params) {
     return request({
         url: util.ajaxFront + '/merchantBizType/querySysBizType',
@@ -84,6 +119,11 @@ export default {
     merchantListLimit,
     systemBis,
     addMerchant,
+    updateMerchant,
+    deleteMerchant,
+    recoverMerchant,
+
+    accountList,
 
     paySceneList,
     sceneList,
