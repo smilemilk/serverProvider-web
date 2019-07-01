@@ -33,6 +33,7 @@ export function updateMerchant (params) {
         params: params,
         data: params
     });
+
 }
 export function deleteMerchant (params) {
     return request({
@@ -68,7 +69,14 @@ export function channelsList (params) {
         data: params
     });
 }
-
+export function submitAccount (params) {
+    return request({
+        url: util.ajaxFront + '/thirdpay/account/submit',
+        method: 'post',
+        params: params,
+        data: params
+    });
+}
 
 
 //支付场景配置
@@ -135,6 +143,7 @@ export default {
 
     accountList,
     channelsList,
+    submitAccount,
 
     paySceneList,
     sceneList,

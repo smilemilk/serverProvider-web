@@ -36,52 +36,18 @@
         <Modal
                 v-model="operShow"
                 :mask-closable=false
-                @on-cancel="modalReset"
+                @on-cancel="modalOperReset"
                 :styles="{top:'50%',overflowY: 'auto',maxHeight: '94%',transform: 'translateY(-50%) !important', width: '650px'}"
         >
             <h3 slot="header">{{operModelTitle}}</h3>
 
-            <ul class="channels-wrapper">
-                <li v-for="item in channelsDetails"
-                    @click="channelHandle(item)"
-                    class="channel-item"
-                    :class="item.active ? 'active' : ''"
-                >
-                    <i :class="'channel_'+item.channelCode"></i>
-                    <p>{{item.channel}}</p>
-                </li>
-            </ul>
-            <!--<Form ref="merchantform"-->
-                  <!--:model="merchantform"-->
-                  <!--:label-width="160"-->
-                  <!--label-position="right"-->
-                  <!--:rules="merchantValidate">-->
-                <!--<FormItem label="商户业务类型编码:"-->
-                          <!--prop="merchantId"-->
-                          <!--required-->
-                <!--&gt;-->
-                    <!--<Input style="width:166px;"-->
-                           <!--:disabled="editStatus&&!editOperStatus"-->
-                           <!--v-model="merchantform.merchantId" placeholder="请输入商户业务类型编码"/>-->
-                <!--</FormItem>-->
-                <!--<FormItem label="商户业务类型名称:"-->
-                          <!--prop="merchantName"-->
-                          <!--required-->
-                <!--&gt;-->
-                    <!--<Input style="width:166px;"-->
-                           <!--:disabled="editStatus&&!editOperStatus"-->
-                           <!--v-model="merchantform.merchantName" placeholder="请输入商户业务类型名称"/>-->
-                <!--</FormItem>-->
-                <!--<FormItem label="系统业务类型:"-->
-                          <!--required-->
-                <!--&gt;-->
-                    <!--<div class="flex-content flex-content-start">-->
-                    <!--</div>-->
+            <div v-if="channelActive && channelActive.channelCode === 'wx'">
+                <wechat-config></wechat-config>
+            </div>
 
-                <!--</FormItem>-->
-            <!--</Form>-->
-
-            <div>
+            <div v-else-if="channelActive && channelActive.channelCode === 'alipay'">
+            </div>
+            <div v-else>
                 <p>微脉代收账户，T+1结算给商户。微脉代收账户号</p>
             </div>
             <div slot="footer">
@@ -103,11 +69,14 @@
 <script>
     import ajax from '@/api/configureManage';
     import {validaNumberCase, validaCommon} from '@/libs/validate';
+    import WechatConfig from './wechatConfig';
 
     export default {
         name: 'ModalOper',
-        components: {},
-        props: ['id'],
+        components: {
+            WechatConfig
+        },
+        // props: ['id'],
         data () {
             // const validaNumberCaseRule = (rule, value, callback) => {
             //     if (value) {
@@ -197,6 +166,7 @@
                     this.modalReset();
 
                     this.operShow = true;
+                    console.log(this.channelActive)
                     // ajax.updateMerchant(
                     //     {
                     //         'merchantBizTypeCode': this.merchantform.merchantId + '',
@@ -251,6 +221,10 @@
                     }
                     return it;
                 });
+            },
+
+            modalOperReset() {
+                this.channelActive = {};
             }
         }
     };
