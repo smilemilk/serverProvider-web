@@ -255,7 +255,6 @@
                 });
             },
             activeAction(item) {
-                console.log(item)
                 const list = this.activeList;
                 this.activeList = [...list.map((it,key)=>{
                    if (key === item) {

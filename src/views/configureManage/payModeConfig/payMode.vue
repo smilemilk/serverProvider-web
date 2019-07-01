@@ -1,18 +1,10 @@
 <template>
     <div>
         <div class="margin-bottom-10">
-            <!--<Button-group class="margin-right-50">-->
-                <!--<Button :type="activeList[0]>0 ? 'primary' : 'default'" @click="activeAction(0)" class="">当前使用-->
-                <!--</Button>-->
-                <!--<Button :type="activeList[1]>0 ? 'primary' : 'default'" @click="activeAction(1)" class="">已废除-->
-                <!--</Button>-->
-            <!--</Button-group>-->
 
             <Button type="primary" @click="addAction()" class="margin-right-15">新增
             </Button>
 
-            <!--<Button type="default" @click="helpAction()" class="">帮助-->
-            <!--</Button>-->
         </div>
 
         <Table
