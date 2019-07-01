@@ -32,18 +32,25 @@
               :current="this.queryParams.page"
               @on-change="handleCurrentPageChange">
         </Page>
+
+        <modal-oper
+                ref="merchantModal"
+        ></modal-oper>
     </div>
 </template>
 
 <script>
     import {parseTime} from '@/filters';
     import ajax from '@/api/configureManage';
+    import ModalOper from './payAccount/modalOper';
 
     export default {
         name: 'payAccount',
-        components: {},
+        components: {
+            ModalOper
+        },
         data () {
-            return  {
+            return {
                 activeList: [1, -1],
                 total: 0,
                 loading: true,
@@ -56,7 +63,7 @@
                         align: 'center',
                         minWidth: 30,
                         render: (h, params) => {
-                            return h('div', (params.index*1+1)*(this.queryParams.page));
+                            return h('div', (params.index * 1 + 1) * (this.queryParams.page));
                         }
                     },
                     {
@@ -132,12 +139,12 @@
         created () {
             this.getList();
         },
-        computed:{
+        computed: {
             queryParams: {
-                get: function() {
+                get: function () {
                     const query = this.queryParamsPrimary;
 
-                    console.log(query)
+                    console.log(query);
                     return {
                         payeeId: query.merchantId,
                         status: 0,
@@ -145,15 +152,15 @@
                         page: query.page,
                     };
                 },
-                set: function(newValue) {
+                set: function (newValue) {
                     return newValue;
                 }
             },
             queryMerchant: {
-                get: function() {
+                get: function () {
                     return this.queryMerchantPrimary;
                 },
-                set: function(newValue) {
+                set: function (newValue) {
                     return newValue;
                 }
             },
@@ -236,7 +243,7 @@
                 });
             },
             addAction () {
-                if (this.queryMerchant.merchantId === this.queryParams.merchantId) {
+                if (this.queryMerchant.merchantId === this.queryParams.payeeId) {
                     this.$refs.merchantModal.show('add');
                 } else {
                     this.$Message.info({
@@ -249,21 +256,21 @@
             helpAction () {
                 this.$Modal.info({
                     title: '帮助说明',
-                    content: '1、微脉代收账户为默认开通账户，无需配置账户信息，也不可修改账户信息\n' +
-                    '2、若未配置直收账户，则使用微脉代收账户收款；若某资金通道配置直收账户，则优先使用直收账户收款\n' +
-                    '3、目前一个资金通道只开放配置一个直收账户'
+                    content: '<p>1、微脉代收账户为默认开通账户，无需配置账户信息，也不可修改账户信息\n</p>' +
+                    '<p>2、若未配置直收账户，则使用微脉代收账户收款；若某资金通道配置直收账户，则优先使用直收账户收款\n</p>' +
+                    '<p>3、目前一个资金通道只开放配置一个直收账户</p>'
                 });
             },
-            activeAction(item) {
+            activeAction (item) {
                 const list = this.activeList;
-                this.activeList = [...list.map((it,key)=>{
-                   if (key === item) {
-                       it=1;
-                   } else {
-                       it=-1;
-                   }
-                   return it;
-               })];
+                this.activeList = [...list.map((it, key) => {
+                    if (key === item) {
+                        it = 1;
+                    } else {
+                        it = -1;
+                    }
+                    return it;
+                })];
 
                 this.queryParams.status = item;
                 this.getListAction();

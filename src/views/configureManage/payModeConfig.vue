@@ -154,11 +154,19 @@
                     };
                 }
 
-                if (item === 'account') {
-                    this.$refs.payAccount.getList();
+                if (this.tabCurrent === 'account') {
+                    if (this.$refs.payAccount){
+                        this.$nextTick(()=>{
+                            this.$refs.payAccount.getList();
+                        });
+                    }
                 }
-                if (item === 'mode') {
-                    this.$refs.payMode.getList();
+                if (this.tabCurrent === 'mode') {
+                    if (this.$refs.payMode) {
+                        this.$nextTick(()=>{
+                            this.$refs.payMode.getList();
+                        });
+                    }
                 }
             },
             addAction () {
@@ -176,10 +184,18 @@
                 if (this.tabCurrent !== item) {
                     this.tabCurrent = item;
                     if (item==='account') {
-                        this.$refs.payAccount.getList();
+                        if (this.$refs.payAccount){
+                            this.$nextTick(()=>{
+                                this.$refs.payAccount.getList();
+                            });
+                        }
                     }
                     if (item==='mode') {
-                        this.$refs.payMode.getList();
+                        if (this.$refs.payMode) {
+                            this.$nextTick(()=>{
+                                this.$refs.payMode.getList();
+                            });
+                        }
                     }
                 }
             }

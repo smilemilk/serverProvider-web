@@ -60,6 +60,16 @@ export function accountList (params) {
         data: params
     });
 }
+export function channelsList (params) {
+    return request({
+        url: util.ajaxFront + '/thirdpay/account/channels',
+        method: 'post',
+        params: params,
+        data: params
+    });
+}
+
+
 
 //支付场景配置
 export function systemBis (params) {
@@ -124,6 +134,7 @@ export default {
     recoverMerchant,
 
     accountList,
+    channelsList,
 
     paySceneList,
     sceneList,
