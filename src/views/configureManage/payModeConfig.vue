@@ -25,17 +25,23 @@
 
                 <div>
                     <Tabs
-                            value="result"
+                            value="account"
                             @on-click="tabHandle"
+                            active-name="account"
                     >
-                        <TabPane label="收款账户配置" name="result">
+                        <TabPane label="收款账户配置" name="account">
                             <pay-account
                                     ref="payAccount"
                                     :query-params-primary="queryParams"
                                     :query-merchant-primary="queryMerchant"
                             ></pay-account>
                         </TabPane>
-                        <TabPane label="支付方式配置" name="source" style="position: relative;">
+                        <TabPane label="支付方式配置" name="mode" style="position: relative;">
+                            <pay-mode
+                                    ref="payMode"
+                                    :query-params-primary="queryParams"
+                                    :query-merchant-primary="queryMerchant"
+                            ></pay-mode>
                         </TabPane>
                     </Tabs>
 
@@ -48,18 +54,20 @@
 
 <script>
     import WmCard from '_c/card/card';
-    import storeData from './store/businessTypeConfig';
+    import storeData from './store/payModeConfig';
     import {parseTime} from '@/filters';
     import ajax from '@/api/configureManage';
     import MerchantSelect from './select/select';
     import payAccount from './payModeConfig/payAccount';
+    import payMode from './payModeConfig/payMode';
 
     export default {
         name: 'payModeConfig',
         components: {
             WmCard,
             MerchantSelect,
-            payAccount
+            payAccount,
+            payMode
         },
         data () {
             return Object.assign({}, storeData.call(this), {
@@ -74,9 +82,11 @@
                     page: 1,
                     limit: 10
                 },
+                tabCurrent: 'account'
             });
         },
         created () {
+            this.tabHandle(this.tabCurrent);
         },
         mounted () {
             Promise.all([this.getMerchantList()]).then((results) => {
@@ -143,7 +153,12 @@
                     };
                 }
 
-                this.$refs.payAccount.getList();
+                if (item==='account') {
+                    this.$refs.payAccount.getList();
+                }
+                if (item==='mode') {
+                    this.$refs.payMode.getList();
+                }
             },
             addAction () {
 
@@ -156,8 +171,16 @@
                     '3、目前一个资金通道只开放配置一个直收账户'
                 });
             },
-            tabHandle () {
-
+            tabHandle (item) {
+                if (this.tabCurrent !== item) {
+                    this.tabCurrent = item;
+                    if (item==='account') {
+                        this.$refs.payAccount.getList();
+                    }
+                    if (item==='mode') {
+                        this.$refs.payMode.getList();
+                    }
+                }
             }
         }
     };

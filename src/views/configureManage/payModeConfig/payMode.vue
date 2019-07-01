@@ -1,18 +1,18 @@
 <template>
     <div>
         <div class="margin-bottom-10">
-            <Button-group class="margin-right-50">
-                <Button :type="activeList[0]>0 ? 'primary' : 'default'" @click="activeAction(0)" class="">当前使用
-                </Button>
-                <Button :type="activeList[1]>0 ? 'primary' : 'default'" @click="activeAction(1)" class="">已废除
-                </Button>
-            </Button-group>
+            <!--<Button-group class="margin-right-50">-->
+                <!--<Button :type="activeList[0]>0 ? 'primary' : 'default'" @click="activeAction(0)" class="">当前使用-->
+                <!--</Button>-->
+                <!--<Button :type="activeList[1]>0 ? 'primary' : 'default'" @click="activeAction(1)" class="">已废除-->
+                <!--</Button>-->
+            <!--</Button-group>-->
 
             <Button type="primary" @click="addAction()" class="margin-right-15">新增
             </Button>
 
-            <Button type="default" @click="helpAction()" class="">帮助
-            </Button>
+            <!--<Button type="default" @click="helpAction()" class="">帮助-->
+            <!--</Button>-->
         </div>
 
         <Table
@@ -40,7 +40,7 @@
     import ajax from '@/api/configureManage';
 
     export default {
-        name: 'payAccount',
+        name: 'payMode',
         components: {},
         data () {
             return  {
@@ -193,7 +193,7 @@
                             this.queryParams.page = 1;
                             this.loading = false;
                             this.$Message.error({
-                                content: response.msg ? response.msg : '业务类型管理请求未成功',
+                                content: response.msg ? response.msg : '支付方式配置请求未成功',
                                 duration: 2,
                                 closable: true
                             });
