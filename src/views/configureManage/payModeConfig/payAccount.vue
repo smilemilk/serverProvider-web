@@ -35,6 +35,7 @@
 
         <modal-oper
                 ref="merchantModal"
+                :id="id"
         ></modal-oper>
     </div>
 </template>
@@ -135,7 +136,7 @@
                 ],
             };
         },
-        props: ['queryParamsPrimary', 'queryMerchantPrimary'],
+        props: ['queryParamsPrimary', 'queryMerchantPrimary', 'id'],
         created () {
             this.getList();
         },

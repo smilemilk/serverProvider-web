@@ -37,6 +37,7 @@
                                 ref="payAccount"
                                 :query-params-primary="queryParams"
                                 :query-merchant-primary="queryMerchant"
+                                :id="this.queryMerchant.merchantId"
                         ></pay-account>
 
                         <pay-mode
@@ -44,6 +45,7 @@
                                 ref="payMode"
                                 :query-params-primary="queryParams"
                                 :query-merchant-primary="queryMerchant"
+                                :id="this.queryMerchant.merchantId"
                         ></pay-mode>
                     </div>
 

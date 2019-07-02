@@ -26,7 +26,7 @@
                 </Button>
                 <Button type="primary"
                         :loading="submitLoading"
-                        @click="saveAction()"
+                        @click="nextAction()"
                 >{{dialogSubmitText}}
                 </Button>
             </div>
@@ -43,11 +43,17 @@
 
             <div v-if="channelActive">
                 <div v-if="channelActive.channelCode === 'wx'">
-                    <wechat-config></wechat-config>
+                    <wechat-config
+                            ref="configForm_wx"
+                            :id="id"
+                    ></wechat-config>
                 </div>
 
                 <div v-else-if="channelActive.channelCode === 'alipay'">
-                    <alipay-config></alipay-config>
+                    <alipay-config
+                            ref="configForm_alipay"
+                            :id="id"
+                    ></alipay-config>
                 </div>
                 <div v-else>
                     <p>微脉代收账户，T+1结算给商户。微脉代收账户号</p>
@@ -82,7 +88,7 @@
             WechatConfig,
             AlipayConfig
         },
-        // props: ['id'],
+        props: ['id'],
         data () {
             // const validaNumberCaseRule = (rule, value, callback) => {
             //     if (value) {
@@ -167,33 +173,48 @@
                 });
 
             },
-            saveAction () {
+            nextAction () {
                 if (Object.keys(this.channelActive).length) {
                     this.modalReset();
 
                     this.operShow = true;
-                    console.log(this.channelActive)
-                    // ajax.updateMerchant(
-                    //     {
-                    //         'merchantBizTypeCode': this.merchantform.merchantId + '',
-                    //         'merchantBizTypeName': this.merchantform.merchantName + '',
-                    //         'merchantId': this.id + '',
-                    //         'sysBizTypeId': this.bisType.rank02_id + ''
-                    //     }
-                    // ).then(response => {
-                    //     if (response.success === true) {
-                    //         this.modalReset();
-                    //
-                    //         this.$emit('on-success');
-                    //     } else {
-                    //         this.$Message.error({
-                    //             content: response.msg ? response.msg : '支付场景配置请求未成功',
-                    //             duration: 2,
-                    //             closable: true
-                    //         });
-                    //     }
-                    // }).catch(() => {
-                    // });
+                } else {
+                    this.$Message.info({
+                        content: '请选择资金通道',
+                        duration: 2,
+                        closable: true
+                    });
+                }
+            },
+            saveAction () {
+                if (Object.keys(this.channelActive).length) {
+                    console.log(this.channelActive);
+
+                    if (this.channelActive.channelCode === 'alipay' || this.channelActive.channelCode === 'wx') {
+                        // ajax.updateMerchant(
+                        //     {
+                        //         'merchantBizTypeCode': this.merchantform.merchantId + '',
+                        //         'merchantBizTypeName': this.merchantform.merchantName + '',
+                        //         'merchantId': this.id + '',
+                        //         'sysBizTypeId': this.bisType.rank02_id + ''
+                        //     }
+                        // ).then(response => {
+                        //     if (response.success === true) {
+                        //         this.modalReset();
+                        //
+                        //         this.$emit('on-success');
+                        //     } else {
+                        //         this.$Message.error({
+                        //             content: response.msg ? response.msg : '支付场景配置请求未成功',
+                        //             duration: 2,
+                        //             closable: true
+                        //         });
+                        //     }
+                        // }).catch(() => {
+                        // });
+                        // this.$refs.configForm_wx
+                        this.$refs.configForm_alipay.formSubmit();
+                    }
                 } else {
                     this.$Message.info({
                         content: '请选择资金通道',
@@ -229,7 +250,7 @@
                 });
             },
 
-            modalOperReset() {
+            modalOperReset () {
                 this.channelActive = {};
             }
         }

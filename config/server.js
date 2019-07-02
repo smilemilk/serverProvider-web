@@ -1,1 +1,1 @@
-module.exports = "https://test.weimaipay.com/unioncheck/"
+module.exports = "http://localhost:8067/unioncheck/"

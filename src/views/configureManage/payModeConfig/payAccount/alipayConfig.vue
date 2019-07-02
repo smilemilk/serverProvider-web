@@ -1,6 +1,6 @@
 <template>
     <div>
-        <Form ref="wechatForm"
+        <Form ref="alipayForm"
               :model="queryForm"
               :label-width="160"
               label-position="right"
@@ -75,7 +75,7 @@
         components: {
             ConfigTable
         },
-        // props: ['id'],
+        props: ['id'],
         data () {
             const validaNumberCaseRule = (rule, value, callback) => {
                 if (value) {
@@ -124,7 +124,7 @@
                     ],
                 },
                 queryForm: {
-                    payeeId: '',
+                    payeeId: this.id,
                     channelCode: 'alipay',
                     aliPayAccount: '',
                     remark: '',
@@ -144,7 +144,14 @@
         watch: {},
         methods: {
             signTypeHandle(item) {
-                console.log(item)
+                this.queryForm.signType = item;
+            },
+            formSubmit() {
+                this.$refs['alipayForm'].validate((valid) => {
+                    if (valid === true) {
+                        console.log(this.queryForm)
+                    }
+                });
             }
         }
     };
