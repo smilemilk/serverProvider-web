@@ -15,16 +15,6 @@
                   :label-width="160"
                   label-position="right"
                   :rules="merchantValidate">
-
-                <!--channelCode: '',-->
-                <!--: '',-->
-                <!--wxAccount: '',-->
-                <!--: '',-->
-                <!--: '',-->
-                <!--: '',-->
-                <!--: '',-->
-                <!--appBase64P12: '',-->
-                <!--appSecret: ''-->
                 <FormItem label="微信支付账户号(merchantId):"
                           prop="wxAccount"
                           required
@@ -61,19 +51,42 @@
                            v-model="queryForm.appKey" placeholder="请输入API密玥"/>
                 </FormItem>
                 <FormItem label="证书:"
-                          prop="appKey"
+                          prop="appBase64P12"
                           required
                 >
+                    <Upload
+                            ref="upload_appBase64P12"
+                            :multiple="false"
+                           :headers="header"
+                            :data="headerParam_appBase64P12"
+                            :action="uploadUrl_appBase64P12"
+                            :on-error="handleFormatError"
+                            :before-upload="handleUpload"
+                            :on-progress="handleProgress"
+                            :show-upload-list="false"
+                            :with-credentials="true"
+                            name="uFile"
+                            :on-success="uploadSuccess"
+                    >
+                        <Button icon="ios-cloud-upload-outline">上传证书</Button>
+                    </Upload>
                     <p>(如何获取证书，请点击：<a href="http://kf.qq.com/faq/161222NneAJf161222U7fARv.html" target="_blank">http://kf.qq.com/faq/161222NneAJf161222U7fARv.html</a>)</p>
                 </FormItem>
                 <FormItem label="域名验证文件:"
-                          prop="appKey"
+                          prop="hostVerify"
                           required
                 >
+                    <Upload
+                            ref="upload"
+                            :data="headerParam_appBase64P12"
+                            :multiple="false"
+                            :action="uploadUrl_hostVerify">
+                        <Button icon="ios-cloud-upload-outline">上传域名验证文件</Button>
+                    </Upload>
                     <p>(如何验证域名文件，请点击 <a @click="">查看详情</a>)</p>
                 </FormItem>
                 <FormItem label="appSecret:"
-                          prop="appKey"
+                          prop="appSecret"
                           required
                 >
                     <Input style="width:166px;"
@@ -100,6 +113,7 @@
 <script>
     import {validaNumberCase, validaCommon} from '@/libs/validate';
     import ConfigTable from './configTable';
+    import baseUrl from '../../../../../config/server';
 
     export default {
         name: 'WechatConfig',
@@ -154,9 +168,16 @@
                     appSecret: [
                         {required: true, message: '请输入appSecret', trigger: 'blur'},
                     ],
+                    appBase64P12: [
+                        {required: true, message: '请上传证书', trigger: 'blur'},
+                    ],
+                    hostVerify: [
+                        {required: true, message: '请上传域名验证文件', trigger: 'blur'},
+                    ],
                 },
                 activeList: [1, -1],
                 queryForm: {
+                    payeeId: '',
                     channelCode: 'wx',
                     wxAccount: '',
                     remark: '',
@@ -164,9 +185,18 @@
                     merchantId: '',
                     appKey: '',
                     appSecret: '',
-
-                    payeeId: '',
                     appBase64P12: '',
+
+                    hostVerify: ''
+                },
+                uploadUrl_appBase64P12: baseUrl+'thirdpay/account/certUpload',
+                uploadUrl_hostVerify: baseUrl+'thirdpay/account/certUpload',
+                headerParam_appBase64P12: {
+                    "fileType": 1
+                },
+                fileList: [],
+                header: {
+                    dataType: "json"
                 }
             };
         },
@@ -187,6 +217,45 @@
                     }
                     return it;
                 })];
+            },
+            handleUpload(file) { // 上传文件前的事件钩子
+                console.log(this.headerParam_appBase64P12)
+                console.log(file)
+                if (file) {
+                    // this.headerParam = Object.assign({}, this.headerParam, {timestamp: file.lastModified});
+                    this.fileList.push(file);
+                    // 保存文件到需要上传的文件数组里
+                    // this.uploadFile.push(file);
+                }
+            },
+            handleProgress(event, file) {
+                this.$Modal.confirm({
+                    content: '文件 ' + file.name + ' 正在上传...',
+                });
+            },
+            handleFormatError(file) {
+                this.$Modal.confirm({
+                    content: '文件 ' + file.name + ' 格式不正确',
+                    okText: '确定',
+                    cancelText: '取消',
+                });
+                this.headerParam_appBase64P12 = {};
+            },
+            uploadSuccess(res, file) { // 文件上传回调 上传成功后删除待上传文件
+                if (res.success === true) {
+                    this.$Modal.confirm({
+                        content: '文件 ' + file.name + '上传成功',
+                        okText: '确定',
+                    });
+                    // this.headerParam_appBase64P12 = {};
+
+                } else {
+                    this.$Modal.warning({
+                        content: '文件 ' + file.name + res.msg ? res.msg : '上传失败',
+                        okText: '确定',
+                    });
+                    // this.headerParam_appBase64P12 = {};
+                }
             },
         }
     };

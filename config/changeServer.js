@@ -15,7 +15,7 @@ if (argument[0] === 'build') { // 测试
 //   server = 'http://www.weimaipay.com:8070/'
 } else if (argument[0] === 'development') { // 开发
     // server = 'http://192.168.3.236:8070/unioncheck/'
-    server = 'https://test.weimaipay.com/unioncheck/'
+    server = 'http://localhost:8067/unioncheck/'
     // server = 'https://www.weimaipay.com/unioncheck/'
 } else if (argument[0] === 'production') { // 生产
     server = 'https://test.weimaipay.com/unioncheck/'

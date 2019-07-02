@@ -41,15 +41,19 @@
         >
             <h3 slot="header">{{operModelTitle}}</h3>
 
-            <div v-if="channelActive && channelActive.channelCode === 'wx'">
-                <wechat-config></wechat-config>
+            <div v-if="channelActive">
+                <div v-if="channelActive.channelCode === 'wx'">
+                    <wechat-config></wechat-config>
+                </div>
+
+                <div v-else-if="channelActive.channelCode === 'alipay'">
+                    <alipay-config></alipay-config>
+                </div>
+                <div v-else>
+                    <p>微脉代收账户，T+1结算给商户。微脉代收账户号</p>
+                </div>
             </div>
 
-            <div v-else-if="channelActive && channelActive.channelCode === 'alipay'">
-            </div>
-            <div v-else>
-                <p>微脉代收账户，T+1结算给商户。微脉代收账户号</p>
-            </div>
             <div slot="footer">
                 <Button type="text"
                         @click="modalReset()"
@@ -70,11 +74,13 @@
     import ajax from '@/api/configureManage';
     import {validaNumberCase, validaCommon} from '@/libs/validate';
     import WechatConfig from './wechatConfig';
+    import AlipayConfig from './alipayConfig';
 
     export default {
         name: 'ModalOper',
         components: {
-            WechatConfig
+            WechatConfig,
+            AlipayConfig
         },
         // props: ['id'],
         data () {

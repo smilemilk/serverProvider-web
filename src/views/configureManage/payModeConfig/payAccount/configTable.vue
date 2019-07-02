@@ -1,15 +1,12 @@
 <template>
-    <div class="table-description">
-        <dl v-for="(item,key) in dataDescription"
+    <div class="table-description" v-if="dataDescription">
+        <dl v-for="item in dataDescription"
         >
             <dt>
                 {{item.name}}
             </dt>
             <dd>
-                <span v-if="key===0" class="table-item">
-                   {{config === 'wx' ? '微信' : ''}}{{item.des}}
-                </span>
-                <span v-else class="table-item">
+                <span class="table-item">
                     {{item.des}}
                 </span>
             </dd>
@@ -23,44 +20,70 @@
         name: 'ConfigTable',
         components: {},
         props: ['config'],
-        data () {
-            return {
-                dataDescription: [
-                    {
-                        name: '支付场景',
-                        des: '支付账号开通功能'
-                    },
-                    {
-                        name: '微脉APP',
-                        des: 'H5支付'
-                    },
-                    {
-                        name: 'H5',
-                        des: 'H5支付'
-                    },
-                    {
-                        name: '微信公众号',
-                        des: '公众号支付(需公众号)'
-                    },
-                    {
-                        name: '条码枪收款',
-                        des: '刷卡支付(需公众号)'
-                    },
-                    {
-                        name: '聚合码扫码支付',
-                        des: '公众号支付(需公众号)'
-                    },
-                    {
-                        name: '微信原生码扫码',
-                        des: '扫码支付(需公众号)'
+        computed: {
+            dataDescription: {
+                get: function () {
+                    if (this.config === 'wx') {
+                        return [{
+                            name: '微信支付场景',
+                            des: '支付账号开通功能'
+                        },
+                            {
+                                name: '微脉APP',
+                                des: 'H5支付'
+                            },
+                            {
+                                name: 'H5',
+                                des: 'H5支付'
+                            },
+                            {
+                                name: '微信公众号',
+                                des: '公众号支付(需公众号)'
+                            },
+                            {
+                                name: '条码枪收款',
+                                des: '刷卡支付(需公众号)'
+                            },
+                            {
+                                name: '聚合码扫码支付',
+                                des: '公众号支付(需公众号)'
+                            },
+                            {
+                                name: '微信原生码扫码',
+                                des: '扫码支付(需公众号)'
+                            }];
                     }
-                ]
-            };
-        },
-        created () {
-        },
-        mounted () {
-
+                    if (this.config === 'alipay') {
+                        return [{
+                            name: '支付场景',
+                            des: '支付宝账号开通功能'
+                        },
+                            {
+                                name: '微脉APP',
+                                des: '手机网页支付或app支付'
+                            },
+                            {
+                                name: 'H5',
+                                des: '手机网页支付'
+                            },
+                            {
+                                name: '支付宝生活号',
+                                des: '手机网页支付'
+                            },
+                            {
+                                name: '条码枪收款',
+                                des: '当面付'
+                            },
+                            {
+                                name: '聚合码扫码支付',
+                                des: '手机网页支付'
+                            }];
+                    }
+                },
+                set: function (newValue) {
+                    return newValue;
+                }
+            }
         },
         watch: {},
         methods: {}
@@ -77,7 +100,7 @@
         flex-wrap: wrap;
         flex-direction: row;
         dl {
-            flex:1;
+            flex: 1;
             border-right: 1px solid @border-theme;
             &:nth-last-child(1) {
                 border: none;
