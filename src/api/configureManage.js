@@ -77,7 +77,14 @@ export function submitAccount (params) {
         data: params
     });
 }
-
+export function accountDetail (params) {
+    return request({
+        url: util.ajaxFront + '/thirdpay/account/detailInfo',
+        method: 'post',
+        params: params,
+        data: params
+    });
+}
 
 //支付场景配置
 export function systemBis (params) {
@@ -144,6 +151,7 @@ export default {
     accountList,
     channelsList,
     submitAccount,
+    accountDetail,
 
     paySceneList,
     sceneList,

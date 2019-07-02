@@ -46,6 +46,7 @@
                     <wechat-config
                             ref="configForm_wx"
                             :id="id"
+                            @on-submit="getQuery_wx"
                     ></wechat-config>
                 </div>
 
@@ -53,6 +54,7 @@
                     <alipay-config
                             ref="configForm_alipay"
                             :id="id"
+                            @on-submit="getQuery_alipay"
                     ></alipay-config>
                 </div>
                 <div v-else>
@@ -62,7 +64,7 @@
 
             <div slot="footer">
                 <Button type="text"
-                        @click="modalReset()"
+                        @click="modalOperReset()"
                 >{{dialogCancelText}}
                 </Button>
                 <Button type="primary"
@@ -134,7 +136,9 @@
                 dialogSubmitText: '下一步',
 
                 operShow: false,
-                operModelTitle: '配置账户信息'
+                operModelTitle: '配置账户信息',
+
+                configResult: {}
             };
         },
         created () {
@@ -145,12 +149,7 @@
         watch: {},
         methods: {
             show (status, row) {
-                if (status === 'add') {
-                }
-                if (status === 'edit') {
-                    this.dialogSubmitText = '修改';
-                }
-
+                this.dialogSubmitText = '下一步';
                 this.dialogShow = true;
 
                 ajax.channelsList({}).then(response => {
@@ -175,9 +174,32 @@
             },
             nextAction () {
                 if (Object.keys(this.channelActive).length) {
-                    this.modalReset();
-
+                    this.dialogShow = false;
+                    this.dialogSubmitText = '保存';
                     this.operShow = true;
+
+                    if (this.channelActive.channelCode !== 'alipay' && this.channelActive.channelCode !== 'wx') {
+                        ajax.submitAccount(
+                            this.configResult.value
+                        ).then(response => {
+                            if (response.success === true) {
+                                this.modalReset();
+                                this.$emit('on-success');
+
+                                if (this.channelActive.channelCode === 'alipay') {
+                                    this.$refs.configForm_alipay.formReset();
+                                }
+
+                            } else {
+                                this.$Message.error({
+                                    content: response.msg ? response.msg : '账户配置请求未成功',
+                                    duration: 2,
+                                    closable: true
+                                });
+                            }
+                        }).catch(() => {
+                        });
+                    }
                 } else {
                     this.$Message.info({
                         content: '请选择资金通道',
@@ -186,34 +208,44 @@
                     });
                 }
             },
+            getQuery_wx (item) {
+
+            },
+            getQuery_alipay (item) {
+                this.configResult = item;
+            },
             saveAction () {
                 if (Object.keys(this.channelActive).length) {
-                    console.log(this.channelActive);
-
                     if (this.channelActive.channelCode === 'alipay' || this.channelActive.channelCode === 'wx') {
-                        // ajax.updateMerchant(
-                        //     {
-                        //         'merchantBizTypeCode': this.merchantform.merchantId + '',
-                        //         'merchantBizTypeName': this.merchantform.merchantName + '',
-                        //         'merchantId': this.id + '',
-                        //         'sysBizTypeId': this.bisType.rank02_id + ''
-                        //     }
-                        // ).then(response => {
-                        //     if (response.success === true) {
-                        //         this.modalReset();
-                        //
-                        //         this.$emit('on-success');
-                        //     } else {
-                        //         this.$Message.error({
-                        //             content: response.msg ? response.msg : '支付场景配置请求未成功',
-                        //             duration: 2,
-                        //             closable: true
-                        //         });
-                        //     }
-                        // }).catch(() => {
-                        // });
+
+                        if (this.channelActive.channelCode === 'alipay') {
+                            this.$refs.configForm_alipay.formSubmit();
+                        }
+
+                        if (this.configResult.status) {
+                            ajax.submitAccount(
+                                this.configResult.value
+                            ).then(response => {
+                                if (response.success === true) {
+                                    this.modalReset();
+                                    this.$emit('on-success');
+
+                                    if (this.channelActive.channelCode === 'alipay') {
+                                        this.$refs.configForm_alipay.formReset();
+                                    }
+
+                                } else {
+                                    this.$Message.error({
+                                        content: response.msg ? response.msg : '账户配置请求未成功',
+                                        duration: 2,
+                                        closable: true
+                                    });
+                                }
+                            }).catch(() => {
+                            });
+                        }
+
                         // this.$refs.configForm_wx
-                        this.$refs.configForm_alipay.formSubmit();
                     }
                 } else {
                     this.$Message.info({
@@ -231,11 +263,24 @@
                 this.submitLoading = false;
                 this.channelsDetails = [];
 
-                // if (this.$refs[formName]) {
-                //     this.$refs[formName].resetFields();
-                // } else {
-                //     this.$refs['merchantform'].resetFields();
-                // }
+                if (this.operShow) {
+                    this.operShow = false;
+                }
+
+                if (this.$refs[formName]) {
+                    this.$refs[formName].resetFields();
+                } else {
+                    if (this.$refs['alipayForm']) {
+                        this.$refs['alipayForm'].resetFields();
+                    }
+                    if (this.$refs['wechatForm']) {
+                        this.$refs['wechatForm'].resetFields();
+                    }
+                }
+
+                if (this.configResult) {
+                    this.configResult = {};
+                }
             },
 
             channelHandle (row) {
@@ -251,7 +296,10 @@
             },
 
             modalOperReset () {
-                this.channelActive = {};
+                this.operShow = false;
+                if (this.channelActive.channelCode === 'alipay') {
+                    this.$refs.configForm_alipay.formReset();
+                }
             }
         }
     };

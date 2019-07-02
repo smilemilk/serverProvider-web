@@ -143,15 +143,34 @@
         },
         watch: {},
         methods: {
-            signTypeHandle(item) {
+            signTypeHandle (item) {
                 this.queryForm.signType = item;
             },
-            formSubmit() {
+            formSubmit () {
                 this.$refs['alipayForm'].validate((valid) => {
                     if (valid === true) {
-                        console.log(this.queryForm)
+                        this.$emit('on-submit', {
+                            status: true,
+                            value: this.queryForm
+                        });
+                    } else {
+                        this.$emit('on-submit', {
+                            status: false,
+                        });
                     }
                 });
+            },
+            formReset () {
+                this.$refs['alipayForm'].resetFields();
+                this.queryForm.payeeId = '';
+                this.queryForm.channelCode = '';
+                this.queryForm.aliPayAccount = '';
+                this.queryForm.remark = '';
+                this.queryForm.signType = '';
+                this.queryForm.aliPayAppId = '';
+                this.queryForm.PID = '';
+                this.queryForm.appPrivateKey = '';
+                this.queryForm.aliPayPublicKey = '';
             }
         }
     };

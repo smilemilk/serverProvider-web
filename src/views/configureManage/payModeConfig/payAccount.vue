@@ -36,6 +36,7 @@
         <modal-oper
                 ref="merchantModal"
                 :id="id"
+                @on-success="getListAction"
         ></modal-oper>
     </div>
 </template>
