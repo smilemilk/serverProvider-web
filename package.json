@@ -100,7 +100,7 @@
     "webpack-dev-server": "^2.10.1",
     "webpack-merge": "^4.1.1",
     "webpack-uglify-parallel": "^0.1.4",
-    "yarn": "^1.10.1"
+    "yarn": "^1.17.3"
   },
   "engines": {
     "node": ">= 4.0.0",
